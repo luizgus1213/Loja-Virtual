@@ -1,0 +1,20 @@
+.btn {
+  background-color: #3483fa;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: 0.2s;
+}
+
+.btn:hover {
+  background-color: #2968c8;
+}
+
+/* .btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px regba(46, 125, 50, 0.3);
+} */

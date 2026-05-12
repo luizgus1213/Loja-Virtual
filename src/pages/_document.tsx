@@ -4,6 +4,7 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head />
+      <title>Lg Trambicagens</title>
       <body>
         <Main />
         <NextScript />

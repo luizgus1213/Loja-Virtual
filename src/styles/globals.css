@@ -6,7 +6,6 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
   }
 }
 
@@ -39,4 +38,11 @@ a {
   html {
     color-scheme: dark;
   }
+}
+body {
+  background: #000000;
+}
+img {
+  max-width: 100%;
+  height: auto;
 }

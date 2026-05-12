@@ -1,0 +1,72 @@
+.container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: linear-gradient(135deg, #3a5c8f, #0d048a9e);
+}
+
+.card {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+
+  width: 100%;
+  max-width: 350px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* TÍTULO */
+.card h1 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* INPUTS */
+.card input {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  outline: none;
+  font-size: 14px;
+}
+
+.card input:focus {
+  border-color: #3483fa;
+}
+
+/* BOTÃO */
+.card button {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+
+  background-color: #3483fa;
+  color: white;
+  font-weight: bold;
+
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.card button:hover {
+  background-color: #2968c8;
+}
+
+/* LINK */
+.card p {
+  text-align: center;
+  font-size: 14px;
+  color: #3483fa;
+  cursor: pointer;
+}
+
+.card p:hover {
+  text-decoration: underline;
+}
