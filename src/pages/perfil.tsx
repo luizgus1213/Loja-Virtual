@@ -5,6 +5,8 @@ import styles from "./perfil.module.css";
 import Cropper from "react-easy-crop";
 import validarCPF from "@/lib/validarCPF";
 import { getCroppedImg } from "@/lib/cropImage";
+import CaixaEndereco from "@/components/CaixaEndereco";
+
 export default function Perfil() {
   const router = useRouter();
   const [imagemSrc, setImagemSrc] = useState<string | null>(null);
@@ -323,28 +325,20 @@ export default function Perfil() {
             <button className={styles.botaoSalvar}>Adicionar cartão</button>
           </div>
         )}
-        {tela === "enderecos" &&
-          user.enderecos.map((endereco: any) => (
-            <div className={styles.editarBox}>
-              <h2 className={styles.titulo}>Endereços</h2>
 
-              <div className={styles.bloco}>
-                <label>Rua</label>
-                <input placeholder="Rua" value={endereco.rua} />
-
-                <label>Número</label>
-                <input placeholder="Número" value={endereco.numero} />
-
-                <label>Cidade</label>
-                <input placeholder="Cidade" value={endereco.cidade} />
-
-                <label>Estado</label>
-                <input placeholder="Estado" value={endereco.estado} />
-              </div>
-
-              <button className={styles.botaoSalvar}>Salvar endereço</button>
-            </div>
-          ))}
+        {tela === "enderecos" && (
+          <>
+            {user.enderecos.map((endereco: any) => (
+              <CaixaEndereco
+                key={endereco.id}
+                endereco={endereco}
+                modo="atualizar"
+                carregarUsuario={carregarUsuario}
+              />
+            ))}
+            <CaixaEndereco modo="cadastrar" carregarUsuario={carregarUsuario} />
+          </>
+        )}
         {tela === "privacidade" && (
           <div className={styles.editarBox}>
             <h2 className={styles.titulo}>Privacidade</h2>
