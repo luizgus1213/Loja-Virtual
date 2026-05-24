@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./email.module.css";
-
+import { useAlerta } from "@/contexts/AlertaContext";
 export default function VerificarEmail() {
   const [codigo, setCodigo] = useState("");
   const [email, setEmail] = useState("");
+
+  const { exibirAlerta } = useAlerta();
+
+  const [visivel, setVisivel] = useState(false);
 
   async function carregarUsuario() {
     try {
@@ -34,11 +38,13 @@ export default function VerificarEmail() {
         },
       );
 
-      alert("Email verificado!");
+      exibirAlerta("Email verificado!", "sucesso");
 
-      window.location.href = "/perfil";
+      setTimeout(() => {
+        window.location.href = "/perfil";
+      }, 1500);
     } catch (err: any) {
-      alert(err?.response?.data?.erro || "Erro ao verificar");
+      exibirAlerta(err?.response?.data?.erro || "Erro ao verificar", "erro");
     }
   }
 
@@ -52,11 +58,12 @@ export default function VerificarEmail() {
         },
       );
 
-      alert("Código reenviado!");
+      exibirAlerta("Código reenviado!", "sucesso");
     } catch (err: any) {
-      alert(err?.response?.data?.erro || "Erro");
+      exibirAlerta(err?.response?.data?.erro || "Erro", "erro");
     }
   }
+
   async function cancelarAlteracao() {
     try {
       await axios.post(
@@ -67,13 +74,16 @@ export default function VerificarEmail() {
         },
       );
 
-      alert("Alteração cancelada!");
+      exibirAlerta("Alteração cancelada!", "sucesso");
 
-      window.location.href = "/perfil";
+      setTimeout(() => {
+        window.location.href = "/perfil";
+      }, 1500);
     } catch (err: any) {
-      alert(err?.response?.data?.erro || "Erro ao cancelar");
+      exibirAlerta(err?.response?.data?.erro || "Erro ao cancelar", "erro");
     }
   }
+
   return (
     <div className={styles.container}>
       <div className={styles.card}>
@@ -102,6 +112,7 @@ export default function VerificarEmail() {
         <button className={styles.botao} onClick={reenviarCodigo}>
           Reenviar Código
         </button>
+
         <button className={styles.botao_cancelar} onClick={cancelarAlteracao}>
           Cancelar
         </button>

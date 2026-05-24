@@ -1,0 +1,111 @@
+.toast {
+  position: fixed;
+
+  top: 30px;
+  right: 30px;
+
+  min-width: 320px;
+  max-width: 420px;
+
+  padding: 18px 22px;
+
+  border-radius: 18px;
+
+  color: white;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  backdrop-filter: blur(14px);
+
+  z-index: 999999;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 10px 35px rgba(0, 0, 0, 0.35),
+    inset 0 1px 1px rgba(255, 255, 255, 0.08);
+
+  transform-origin: top right;
+
+  display: flex;
+  align-items: center;
+}
+
+.sucesso {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 184, 148, 0.95),
+    rgba(0, 206, 201, 0.95)
+  );
+}
+
+.erro {
+  background: linear-gradient(
+    135deg,
+    rgba(214, 48, 49, 0.96),
+    rgba(255, 118, 117, 0.96)
+  );
+}
+
+.info {
+  background: linear-gradient(
+    135deg,
+    rgba(9, 132, 227, 0.95),
+    rgba(116, 185, 255, 0.95)
+  );
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateX(120px) scale(0.88);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes desaparecer {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(80px) scale(0.92);
+  }
+}
+
+.entrar {
+  animation: aparecer 0.35s ease forwards;
+}
+
+.sair {
+  animation: desaparecer 0.45s ease forwards;
+}
+
+.barra {
+  position: absolute;
+
+  left: 0;
+  bottom: 0;
+
+  height: 4px;
+
+  background: rgba(255, 255, 255, 0.85);
+
+  transition: width 0.05s linear;
+}
+
+.icone {
+  margin-right: 10px;
+
+  font-size: 18px;
+  font-weight: bold;
+
+  cursor: pointer;
+}

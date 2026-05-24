@@ -1,0 +1,506 @@
+.container {
+  min-height: 100vh;
+
+  padding: 50px 40px;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(52, 131, 250, 0.1),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at bottom right,
+      rgba(34, 197, 94, 0.08),
+      transparent 30%
+    ),
+    var(--background);
+
+  color: var(--foreground);
+}
+
+.titulo {
+  font-size: 34px;
+  font-weight: 900;
+
+  margin-bottom: 28px;
+
+  text-align: center;
+}
+
+.abas {
+  width: 100%;
+  max-width: 700px;
+
+  margin: 0 auto 30px auto;
+
+  padding: 8px;
+
+  border-radius: 999px;
+
+  background: var(--card);
+  border: 1px solid var(--border);
+
+  display: flex;
+  gap: 8px;
+}
+
+.abas button {
+  flex: 1;
+
+  border: none;
+  border-radius: 999px;
+
+  padding: 13px 18px;
+
+  background: transparent;
+  color: var(--foreground);
+
+  font-size: 15px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.abas button span {
+  min-width: 24px;
+  height: 24px;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.1);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 12px;
+}
+
+.abaAtiva {
+  background: linear-gradient(
+    135deg,
+    var(--button),
+    var(--button-hover)
+  ) !important;
+  color: white !important;
+
+  box-shadow: 0 10px 24px rgba(52, 131, 250, 0.25);
+}
+
+.lista {
+  width: 100%;
+  max-width: 950px;
+
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.04);
+
+  border-radius: 22px;
+
+  padding: 22px;
+
+  border: 1px solid var(--border);
+
+  transition: 0.2s;
+
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  border-color: var(--button);
+}
+
+.areaCliqueCard {
+  cursor: pointer;
+}
+
+.topo {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: 14px;
+
+  margin-bottom: 16px;
+}
+
+.numero {
+  font-size: 20px;
+
+  font-weight: 900;
+}
+
+.statusPendente {
+  background: rgba(255, 204, 0, 0.14);
+  color: #ffcc00;
+  border: 1px solid rgba(255, 204, 0, 0.28);
+
+  padding: 7px 13px;
+  border-radius: 999px;
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.statusPago {
+  background: rgba(34, 197, 94, 0.14);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.28);
+
+  padding: 7px 13px;
+  border-radius: 999px;
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.info {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: 16px;
+}
+
+.info strong {
+  font-size: 24px;
+
+  color: var(--button);
+}
+
+.info span {
+  color: var(--text-secondary);
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.expiraEm {
+  width: fit-content;
+
+  margin-top: 14px;
+  padding: 8px 13px;
+
+  border-radius: 999px;
+
+  background: rgba(255, 204, 0, 0.12);
+  color: #ffcc00;
+
+  border: 1px solid rgba(255, 204, 0, 0.25);
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.acoesPedido {
+  display: flex;
+  gap: 12px;
+
+  flex-wrap: wrap;
+
+  margin-top: 20px;
+  padding-top: 18px;
+
+  border-top: 1px solid var(--border);
+}
+
+.acoesPedido button {
+  flex: 1;
+
+  min-width: 160px;
+
+  border: none;
+  border-radius: 16px;
+
+  padding: 13px 16px;
+
+  font-size: 14px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.acoesPedido button:hover {
+  transform: translateY(-2px);
+}
+
+.botaoPagar {
+  background: linear-gradient(135deg, #32bc6e, #16a34a);
+  color: white;
+}
+
+.botaoCancelar {
+  background: rgba(220, 38, 38, 0.14);
+  color: #ff4d4f;
+  border: 1px solid rgba(220, 38, 38, 0.35) !important;
+}
+
+.botaoVer {
+  background: var(--button);
+  color: white;
+}
+
+.botaoComprarNovamente {
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  color: white;
+}
+
+.botaoAvaliar {
+  background: rgba(245, 158, 11, 0.16);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.35) !important;
+}
+
+.vazio {
+  width: 100%;
+  max-width: 700px;
+
+  margin: 0 auto;
+
+  background: var(--card);
+
+  padding: 34px;
+
+  border-radius: 22px;
+
+  text-align: center;
+
+  font-size: 18px;
+  font-weight: 700;
+
+  border: 1px solid var(--border);
+
+  color: var(--text-secondary);
+}
+
+.botaoVoltar {
+  position: fixed;
+
+  top: 20px;
+  left: 20px;
+
+  z-index: 999;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 16px;
+
+  border: 1px solid var(--border);
+  border-radius: 999px;
+
+  background: var(--card);
+  color: var(--foreground);
+
+  cursor: pointer;
+
+  font-weight: 800;
+
+  transition: 0.2s;
+}
+
+.botaoVoltar:hover {
+  transform: translateY(-2px);
+  border-color: var(--button);
+}
+
+@media (max-width: 700px) {
+  .container {
+    padding: 80px 16px 30px 16px;
+  }
+
+  .titulo {
+    font-size: 27px;
+  }
+
+  .abas {
+    border-radius: 20px;
+  }
+
+  .abas button {
+    border-radius: 16px;
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .topo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .acoesPedido {
+    flex-direction: column;
+  }
+
+  .acoesPedido button {
+    width: 100%;
+  }
+}
+
+.resumoPedidoTopo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.imagensPedidoPequenas {
+  display: flex;
+  align-items: center;
+}
+
+.imagemPedidoPequena {
+  position: relative;
+
+  width: 54px;
+  height: 54px;
+
+  border-radius: 14px;
+
+  background: var(--card);
+  border: 1px solid var(--border);
+
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-left: -10px;
+
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.16);
+}
+
+.imagemPedidoPequena:first-child {
+  margin-left: 0;
+}
+
+.imagemPedidoPequena img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  padding: 5px;
+}
+
+.quantidadeMini {
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+
+  min-width: 18px;
+  height: 18px;
+
+  padding: 0 5px;
+
+  border-radius: 999px;
+
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+
+  font-size: 10px;
+  font-weight: 900;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.maisProdutosMini {
+  width: 54px;
+  height: 54px;
+
+  margin-left: -10px;
+
+  border-radius: 14px;
+
+  background: rgba(52, 131, 250, 0.16);
+  border: 1px solid rgba(52, 131, 250, 0.28);
+
+  color: var(--button);
+
+  font-size: 15px;
+  font-weight: 900;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14);
+}
+
+.resumoPedidoTexto {
+  margin-top: 4px;
+
+  color: var(--text-secondary);
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 700px) {
+  .resumoPedidoTopo {
+    width: 100%;
+  }
+
+  .imagemPedidoPequena,
+  .maisProdutosMini {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+  }
+
+  .numero {
+    font-size: 18px;
+  }
+}
+.abas {
+  width: 100%;
+  max-width: 1000px;
+
+  margin: 0 auto 30px auto;
+
+  padding: 8px;
+
+  border-radius: 24px;
+
+  background: var(--card);
+  border: 1px solid var(--border);
+
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.abas button {
+  flex: 1;
+  min-width: 130px;
+}

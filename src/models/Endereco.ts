@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import sequelize from "@/database";
-import User from "@/models/User";
 
 const Endereco = sequelize.define(
   "Endereco",
@@ -10,33 +9,51 @@ const Endereco = sequelize.define(
       primaryKey: true,
       autoIncrement: true,
     },
+
     nome: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+
     rua: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+
     numero: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+
     cep: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+
     bairro: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+
     cidade: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
     },
+
     estado: {
       type: DataTypes.TEXT,
       allowNull: true,
+    },
+
+    complemento: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    endereco_padrao: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
     },
   },
   {

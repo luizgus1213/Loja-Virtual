@@ -1,30 +1,29 @@
 import jwt from "jsonwebtoken";
 
-const SECRET = process.env.JWT_SECRET as string;
-
-interface JwtPayloadType extends jwt.JwtPayload {
-  id: number;
-  email: string;
-  nome: string;
-  acesso: string;
-}
+const JWT_SECRET = process.env.JWT_SECRET || "segredo";
 
 export function gerarToken(user: any) {
+  const dados =
+    typeof user.get === "function" ? user.get({ plain: true }) : user;
+
   return jwt.sign(
     {
-      id: user.id,
-      email: user.email,
-      nome: user.nome,
-      acesso: user.acesso,
+      id: dados.id,
+      nome: dados.nome,
+      email: dados.email,
+      acesso: dados.acesso,
+      token_version: dados.token_version || 1,
     },
-    SECRET,
-    { expiresIn: "7d" },
+    JWT_SECRET,
+    {
+      expiresIn: "7d",
+    },
   );
 }
 
 export function verificarToken(token: string) {
   try {
-    return jwt.verify(token, SECRET) as JwtPayloadType;
+    return jwt.verify(token, JWT_SECRET);
   } catch {
     return null;
   }

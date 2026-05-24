@@ -1,0 +1,180 @@
+.page {
+  min-height: 100vh;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(239, 68, 68, 0.13),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at bottom right,
+      rgba(52, 131, 250, 0.12),
+      transparent 34%
+    ),
+    var(--background);
+
+  color: var(--foreground);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+}
+
+.card {
+  width: 100%;
+  max-width: 560px;
+
+  padding: 34px;
+
+  border-radius: 28px;
+
+  background: var(--card);
+  border: 1px solid var(--border);
+
+  box-shadow: var(--shadow);
+
+  text-align: center;
+
+  animation: entrar 0.28s ease;
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.icone {
+  width: 88px;
+  height: 88px;
+
+  margin: 0 auto 18px auto;
+
+  border-radius: 28px;
+
+  background: rgba(239, 68, 68, 0.13);
+  color: #ef4444;
+
+  border: 1px solid rgba(239, 68, 68, 0.28);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icone svg {
+  width: 44px;
+  height: 44px;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tag {
+  display: inline-block;
+
+  margin-bottom: 12px;
+
+  padding: 7px 13px;
+
+  border-radius: 999px;
+
+  background: rgba(239, 68, 68, 0.13);
+  color: #ef4444;
+
+  border: 1px solid rgba(239, 68, 68, 0.28);
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.card h1 {
+  margin: 0 0 12px 0;
+
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 900;
+
+  letter-spacing: -1px;
+}
+
+.card p {
+  margin: 0 auto 24px auto;
+
+  max-width: 450px;
+
+  color: var(--text-secondary);
+
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.acoes {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+
+  flex-wrap: wrap;
+}
+
+.acoes button {
+  padding: 13px 18px;
+
+  border: none;
+  border-radius: 16px;
+
+  background: var(--button);
+  color: white;
+
+  font-size: 14px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.acoes button:hover {
+  background: var(--button-hover);
+  transform: translateY(-2px);
+}
+
+.acoes .secundario {
+  background: var(--input);
+  color: var(--foreground);
+
+  border: 1px solid var(--border);
+}
+
+.acoes .secundario:hover {
+  border-color: var(--button);
+  color: var(--button);
+
+  background: var(--input);
+}
+
+@media (max-width: 520px) {
+  .card {
+    padding: 26px 20px;
+    border-radius: 24px;
+  }
+
+  .acoes {
+    flex-direction: column;
+  }
+
+  .acoes button {
+    width: 100%;
+  }
+}

@@ -1,15 +1,74 @@
 import BotaoComprar from "../BotaoComprar";
-
+import axios from "axios";
 import style from "./style.module.css";
+import { useAlerta } from "@/contexts/AlertaContext";
+import { useRouter } from "next/router";
+
+interface Produto {
+  id: number;
+  nome: string;
+  marca: string;
+  categoria: string;
+  descricao: string;
+  preco: number;
+  avaliacao: number;
+  estoque: number;
+
+  capa?: {
+    id?: number;
+    nome?: string;
+    link: string;
+  } | null;
+}
 
 const CardProduto = (prod: Produto) => {
+  const { exibirAlerta } = useAlerta();
+  const router = useRouter();
+
+  function abrirProduto() {
+    router.push(`/produto/${prod.id}`);
+  }
+
+  const favoritar = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+
+    try {
+      await axios.post(
+        "/api/favoritos/adicionar",
+        {
+          produtoId: prod.id,
+        },
+        {
+          withCredentials: true,
+        },
+      );
+
+      exibirAlerta("Produto favoritado!", "sucesso");
+    } catch (err: any) {
+      exibirAlerta(err.response?.data?.erro || "Erro", "erro");
+    }
+  };
+
   return (
-    <div className={style["card-produto"]}>
-      <img
-        className={style["card-imagem"]}
-        src={`/${prod.imagem?.link}`}
-        alt=""
-      />
+    <article
+      className={style["card-produto"]}
+      onClick={abrirProduto}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          abrirProduto();
+        }
+      }}
+    >
+      <div className={style["imagem-box"]}>
+        <img
+          className={style["card-imagem"]}
+          src={prod.capa?.link ? `/${prod.capa.link}` : "/sem-imagem.png"}
+          alt={prod.nome}
+        />
+      </div>
+
       <div className={style["card-conteudo"]}>
         <h2 className={style["card-titulo"]}>{prod.nome}</h2>
 
@@ -27,15 +86,40 @@ const CardProduto = (prod: Produto) => {
           }).format(prod.preco)}
         </strong>
 
-        <BotaoComprar text="Comprar Agora" id={prod.id} />
+        <div
+          className={style["acoes"]}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <BotaoComprar text="Comprar Agora" id={prod.id} />
+
+          <button
+            type="button"
+            className={style["botao-favorito"]}
+            onClick={favoritar}
+          >
+            ♡ Favoritar
+          </button>
+        </div>
+
         <div className={style["card-rodape"]}>
           <span className={style["card-avaliacao"]}>
-            {"⭐".repeat(Math.round(prod.avaliacao))} <br />
+            {prod.avaliacao > 0
+              ? "⭐".repeat(Math.round(prod.avaliacao))
+              : "Sem avaliação"}
           </span>
-          <span className={style["card-estoque"]}>Restam {prod.estoque}</span>
+
+          <span
+            className={`${style["card-estoque"]} ${
+              prod.estoque <= 0 ? style["sem-estoque"] : ""
+            }`}
+          >
+            {prod.estoque > 0 ? `${prod.estoque} em estoque` : "Indisponível"}
+          </span>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 

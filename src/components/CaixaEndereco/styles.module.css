@@ -85,3 +85,16 @@
   font-size: 13px;
   font-weight: 600;
 }
+
+.botaoExcluir {
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.botaoExcluir:hover {
+  background: #b91c1c;
+}

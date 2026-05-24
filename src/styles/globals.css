@@ -1,12 +1,48 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  --card: #f5f5f5;
+  --card-transition: background 0.2s, color 0.2s, border-color 0.2s;
+  --border: #d4d4d467;
+  --button-tema: rgb(92, 92, 92);
+  --input: #ffffff;
+
+  --button: #6988b8;
+  --button-hover: #4c5e85;
+
+  --text-secondary: #666666;
+  --buttonlimpar: #ff4d4f;
+
+  --buttonlimparHover: #d7464d;
+  --success: #00a650;
+  --warning: #ffcc00;
+  --danger: #ff4d4f;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-  }
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+
+  --card: #1a1a1a;
+  --card-transition: background 0.2s, color 0.2s, border-color 0.2s;
+  --border: #333333;
+
+  --input: #262626;
+
+  --button: #092f68;
+  --button-hover: #0d3d88;
+  --button-tema: rgb(63, 56, 0);
+  --text-secondary: #aaaaaa;
+  --buttonlimpar: #56191a;
+
+  --buttonlimparHover: #4a1b1c;
+
+  --card-hover: #252525;
+  --success: #00c46a;
+  --warning: #ffd84d;
+  --danger: #ff6666;
+  --shadow: rgba(0, 0, 0, 0.35);
 }
 
 html,
@@ -16,17 +52,23 @@ body {
 }
 
 body {
-  color: var(--foreground);
   background: var(--background);
+  color: var(--foreground);
+
   font-family: Arial, Helvetica, sans-serif;
+
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 * {
   box-sizing: border-box;
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
 
 a {
@@ -34,14 +76,6 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-}
-body {
-  background: #000000;
-}
 img {
   max-width: 100%;
   height: auto;

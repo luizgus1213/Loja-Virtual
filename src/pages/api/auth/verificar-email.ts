@@ -41,10 +41,10 @@ export default async function handler(
       sucesso: true,
     });
   } catch (err) {
-    console.log(err);
+    console.error("ERRO INTERNO:", err);
 
     return res.status(500).json({
-      erro: "Erro interno",
+      erro: "Erro interno no servidor",
     });
   }
 }

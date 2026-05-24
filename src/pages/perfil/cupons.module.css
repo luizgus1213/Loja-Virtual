@@ -1,0 +1,348 @@
+.page {
+  min-height: 100vh;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(52, 131, 250, 0.12),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at bottom right,
+      rgba(124, 58, 237, 0.1),
+      transparent 32%
+    ),
+    var(--background);
+
+  color: var(--foreground);
+
+  padding: 34px 18px 70px;
+}
+
+.container {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.botaoVoltar {
+  margin-bottom: 20px;
+
+  padding: 11px 16px;
+
+  border: 1px solid var(--border);
+  border-radius: 14px;
+
+  background: var(--card);
+  color: var(--foreground);
+
+  font-weight: 900;
+
+  cursor: pointer;
+
+  box-shadow: var(--shadow);
+
+  transition: 0.2s;
+}
+
+.botaoVoltar:hover {
+  border-color: var(--button);
+  color: var(--button);
+  transform: translateY(-2px);
+}
+
+.header {
+  margin-bottom: 24px;
+
+  padding: 26px;
+
+  border-radius: 28px;
+
+  background: var(--card);
+  border: 1px solid var(--border);
+
+  box-shadow: var(--shadow);
+}
+
+.header span {
+  display: inline-block;
+
+  margin-bottom: 8px;
+
+  color: var(--button);
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.header h1 {
+  margin: 0 0 8px;
+
+  font-size: clamp(30px, 4vw, 46px);
+  font-weight: 900;
+
+  letter-spacing: -1px;
+}
+
+.header p {
+  margin: 0;
+
+  color: var(--text-secondary);
+
+  font-weight: 700;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+
+  gap: 18px;
+}
+
+.card {
+  padding: 22px;
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(135deg, rgba(52, 131, 250, 0.12), transparent 45%),
+    var(--card);
+
+  border: 1px solid var(--border);
+
+  box-shadow: var(--shadow);
+
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before,
+.card::after {
+  content: "";
+
+  position: absolute;
+  top: 50%;
+
+  width: 26px;
+  height: 26px;
+
+  border-radius: 999px;
+
+  background: var(--background);
+
+  border: 1px solid var(--border);
+
+  transform: translateY(-50%);
+}
+
+.card::before {
+  left: -14px;
+}
+
+.card::after {
+  right: -14px;
+}
+
+.cardTopo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 14px;
+
+  margin-bottom: 18px;
+}
+
+.cardTopo span {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: var(--text-secondary);
+
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.cardTopo h2 {
+  margin: 0;
+
+  color: var(--button);
+
+  font-size: 30px;
+  font-weight: 900;
+
+  letter-spacing: -1px;
+}
+
+.cardTopo > strong {
+  padding: 10px 12px;
+
+  border-radius: 14px;
+
+  background: rgba(34, 197, 94, 0.13);
+  color: #22c55e;
+
+  border: 1px solid rgba(34, 197, 94, 0.3);
+
+  font-size: 18px;
+  font-weight: 900;
+
+  white-space: nowrap;
+}
+
+.info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 10px;
+
+  margin-bottom: 16px;
+}
+
+.info p {
+  margin: 0;
+
+  padding: 12px;
+
+  border-radius: 16px;
+
+  background: var(--input);
+  border: 1px solid var(--border);
+}
+
+.info span {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: var(--text-secondary);
+
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.info strong {
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.botaoUsar {
+  width: 100%;
+
+  padding: 14px;
+
+  border: none;
+  border-radius: 16px;
+
+  background: linear-gradient(135deg, var(--button), var(--button-hover));
+  color: white;
+
+  font-size: 14px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  box-shadow: 0 14px 26px rgba(52, 131, 250, 0.2);
+
+  transition: 0.2s;
+}
+
+.botaoUsar:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
+.vazio,
+.loadingBox {
+  min-height: 60vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  gap: 14px;
+}
+
+.vazio {
+  padding: 34px;
+
+  border-radius: 26px;
+
+  background: var(--card);
+  border: 1px solid var(--border);
+
+  box-shadow: var(--shadow);
+}
+
+.vazio h2,
+.loadingBox h1 {
+  margin: 0;
+
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.vazio p {
+  margin: 0;
+
+  color: var(--text-secondary);
+
+  font-weight: 700;
+}
+
+.vazio button {
+  padding: 13px 18px;
+
+  border: none;
+  border-radius: 15px;
+
+  background: var(--button);
+  color: white;
+
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+.spinner {
+  width: 46px;
+  height: 46px;
+
+  border-radius: 999px;
+
+  border: 4px solid var(--border);
+  border-top-color: var(--button);
+
+  animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 560px) {
+  .page {
+    padding: 24px 14px 56px;
+  }
+
+  .header,
+  .card,
+  .vazio {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .info {
+    grid-template-columns: 1fr;
+  }
+
+  .cardTopo {
+    flex-direction: column;
+  }
+}

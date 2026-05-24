@@ -1,0 +1,440 @@
+.page {
+  min-height: 100vh;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(52, 131, 250, 0.12),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at bottom right,
+      rgba(124, 58, 237, 0.1),
+      transparent 34%
+    ),
+    var(--background);
+
+  color: var(--foreground);
+
+  padding: 34px 18px 60px;
+}
+
+.container {
+  width: 100%;
+  max-width: 1100px;
+
+  margin: 0 auto;
+}
+
+.botaoVoltar {
+  margin-bottom: 20px;
+
+  padding: 11px 16px;
+
+  border: 1px solid var(--border);
+  border-radius: 12px;
+
+  background: var(--card);
+  color: var(--foreground);
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.botaoVoltar:hover {
+  border-color: var(--button);
+  color: var(--button);
+
+  transform: translateY(-2px);
+}
+
+.header {
+  margin-bottom: 24px;
+
+  padding: 26px;
+
+  border-radius: 26px;
+
+  background: var(--card);
+  border: 1px solid var(--border);
+
+  box-shadow: var(--shadow);
+}
+
+.header span {
+  display: inline-block;
+
+  margin-bottom: 8px;
+
+  color: var(--button);
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.header h1 {
+  margin: 0 0 8px;
+
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 900;
+
+  letter-spacing: -1px;
+}
+
+.header p {
+  margin: 0;
+
+  color: var(--text-secondary);
+
+  font-weight: 700;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+
+  gap: 22px;
+
+  align-items: flex-start;
+}
+
+.cardFoto,
+.cardFormulario {
+  background: var(--card);
+
+  border: 1px solid var(--border);
+  border-radius: 24px;
+
+  padding: 24px;
+
+  box-shadow: var(--shadow);
+}
+
+.cardFoto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  text-align: center;
+}
+
+.avatarBox {
+  width: 130px;
+  height: 130px;
+
+  border-radius: 999px;
+
+  overflow: hidden;
+
+  background: var(--input);
+  border: 3px solid var(--button);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 16px;
+}
+
+.avatarBox img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.avatarTexto {
+  font-size: 46px;
+  font-weight: 900;
+
+  color: var(--button);
+}
+
+.cardFoto h2 {
+  margin: 0 0 6px;
+
+  font-size: 23px;
+  font-weight: 900;
+}
+
+.cardFoto p {
+  margin: 0;
+
+  color: var(--text-secondary);
+
+  font-size: 14px;
+  font-weight: 700;
+
+  word-break: break-word;
+}
+
+.tagAdmin {
+  display: inline-block;
+
+  margin-top: 12px;
+
+  padding: 6px 11px;
+
+  border-radius: 999px;
+
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+
+  border: 1px solid rgba(245, 158, 11, 0.32);
+
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.inputFoto {
+  width: 100%;
+
+  margin-top: 22px;
+
+  padding: 13px 14px;
+
+  border-radius: 14px;
+
+  background: var(--input);
+  color: var(--foreground);
+
+  border: 1px solid var(--border);
+
+  font-size: 14px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.inputFoto:hover {
+  border-color: var(--button);
+  color: var(--button);
+
+  transform: translateY(-2px);
+}
+
+.inputFoto input {
+  display: none;
+}
+
+.botaoFoto {
+  width: 100%;
+
+  margin-top: 12px;
+
+  padding: 13px 14px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: var(--button);
+  color: white;
+
+  font-size: 14px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.botaoFoto:hover:not(:disabled) {
+  background: var(--button-hover);
+  transform: translateY(-2px);
+}
+
+.botaoFoto:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.cardTopo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 18px;
+
+  margin-bottom: 22px;
+}
+
+.cardTopo h2 {
+  margin: 0 0 6px;
+
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.cardTopo p {
+  margin: 0;
+
+  color: var(--text-secondary);
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 16px;
+}
+
+.formGrid label {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  color: var(--text-secondary);
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.formGrid input {
+  width: 100%;
+
+  padding: 14px;
+
+  border: 1px solid var(--border);
+  border-radius: 14px;
+
+  background: var(--input);
+  color: var(--foreground);
+
+  font-size: 15px;
+  font-weight: 700;
+
+  outline: none;
+
+  transition: 0.2s;
+}
+
+.formGrid input:focus {
+  border-color: var(--button);
+  box-shadow: 0 0 0 3px rgba(52, 131, 250, 0.13);
+}
+
+.botaoSalvar {
+  margin-top: 22px;
+
+  width: 100%;
+
+  padding: 15px;
+
+  border: none;
+  border-radius: 16px;
+
+  background: var(--button);
+  color: white;
+
+  font-size: 15px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.botaoSalvar:hover:not(:disabled) {
+  background: var(--button-hover);
+  transform: translateY(-2px);
+}
+
+.botaoSalvar:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.loadingBox,
+.naoEncontrado {
+  min-height: 75vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 16px;
+}
+
+.loadingBox h1,
+.naoEncontrado h1 {
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.naoEncontrado button {
+  padding: 12px 16px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: var(--button);
+  color: white;
+
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+.spinner {
+  width: 46px;
+  height: 46px;
+
+  border-radius: 999px;
+
+  border: 4px solid var(--border);
+  border-top-color: var(--button);
+
+  animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .cardFoto {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 24px 14px 50px;
+  }
+
+  .header,
+  .cardFoto,
+  .cardFormulario {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .avatarBox {
+    width: 108px;
+    height: 108px;
+  }
+
+  .cardTopo h2 {
+    font-size: 21px;
+  }
+}

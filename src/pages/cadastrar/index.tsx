@@ -1,150 +1,285 @@
 import { GetServerSideProps } from "next";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import style from "./style.module.css";
 import axios from "axios";
 import { verificarToken } from "@/lib/auth";
+import { useRouter } from "next/router";
+import { useTema } from "@/contexts/ThemeContext";
+import { useAlerta } from "@/contexts/AlertaContext";
 
-const AdicionarItens = () => {
-  const [produto, setProduto] = useState({
-    nome: "",
-    marca: "",
-    categoria: "",
-    descricao: "",
-    preco: 0,
-    estoque: 0,
-    promocao: false,
-    avaliacao: 0,
-  });
+interface Produto {
+  id: number;
+  nome: string;
+  preco: number;
+  avaliacao: number;
+
+  imagem?: {
+    link: string;
+  };
+
+  imagens?: {
+    arquivo: {
+      link: string;
+    };
+  }[];
+}
+
+const produtoInicial = {
+  nome: "",
+  marca: "",
+  categoria: "",
+  descricao: "",
+  preco: 0,
+  estoque: 0,
+  promocao: false,
+  avaliacao: 0,
+};
+
+export default function AdicionarItens() {
+  const router = useRouter();
+  const { tema } = useTema();
+  const { exibirAlerta } = useAlerta();
+
+  const [produto, setProduto] = useState(produtoInicial);
 
   const [produtos, setProdutos] = useState<Produto[]>([]);
-  const [imagem, setImagem] = useState<File | null>(null);
-  const [produtoParaSalvarId, setProdutoParaSalvarId] = useState<number | null>(
-    null,
-  );
+  const [imagens, setImagens] = useState<File[]>([]);
+  const [preview, setPreview] = useState<string[]>([]);
+
   const [limit, setLimit] = useState(10);
-  const [imagemParaSalvar, setImagemParaSalvar] = useState(null);
   const [buscaAdmin, setBuscaAdmin] = useState("");
 
+  const [salvando, setSalvando] = useState(false);
   const [carregando, setCarregando] = useState(true);
   const [autorizado, setAutorizado] = useState(false);
 
-  const verificarAdmin = async () => {
+  async function verificarAdmin() {
     try {
-      const res = await axios.get("/api/auth/me");
+      const res = await axios.get("/api/auth/me", {
+        withCredentials: true,
+      });
 
       if (res.data?.acesso === "admin") {
         setAutorizado(true);
-      } else {
-        window.location.href = "/";
+        return;
       }
+
+      router.push("/");
     } catch {
-      window.location.href = "/auth";
+      router.push("/auth");
     } finally {
       setCarregando(false);
     }
-  };
+  }
 
-  const carrega_produtos = async () => {
+  async function carregarProdutos() {
     try {
+      setSalvando(true);
+
       const response = await axios.get("/api/admin/listar", {
         params: {
           limit,
           pesquisa: buscaAdmin,
         },
+        withCredentials: true,
       });
 
       setProdutos(response.data);
     } catch (err) {
       console.error(err);
+      exibirAlerta("Erro ao carregar produtos", "erro");
+    } finally {
+      setSalvando(false);
     }
-  };
+  }
 
-  const cadastra_produto = async () => {
+  function adicionarImagens(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files || []);
+
+    if (files.length === 0) return;
+
+    setImagens((imagensAntigas) => [...imagensAntigas, ...files]);
+
+    const novosPreviews = files.map((file) => URL.createObjectURL(file));
+
+    setPreview((previewsAntigos) => [...previewsAntigos, ...novosPreviews]);
+
+    e.target.value = "";
+  }
+
+  function removerImagem(index: number) {
+    setImagens((imagensAntigas) =>
+      imagensAntigas.filter((_, i) => i !== index),
+    );
+
+    setPreview((previewsAntigos) => {
+      URL.revokeObjectURL(previewsAntigos[index]);
+
+      return previewsAntigos.filter((_, i) => i !== index);
+    });
+  }
+
+  async function cadastrarProduto() {
     try {
+      if (!produto.nome.trim()) {
+        return exibirAlerta("Informe o nome do produto", "erro");
+      }
+
+      if (!produto.marca.trim()) {
+        return exibirAlerta("Informe a marca do produto", "erro");
+      }
+
+      if (!produto.categoria.trim()) {
+        return exibirAlerta("Informe a categoria do produto", "erro");
+      }
+
+      if (!produto.descricao.trim()) {
+        return exibirAlerta("Informe a descrição do produto", "erro");
+      }
+
+      if (Number(produto.preco) <= 0) {
+        return exibirAlerta("Informe um preço válido", "erro");
+      }
+
+      if (!Number.isInteger(Number(produto.estoque)) || produto.estoque < 0) {
+        return exibirAlerta("Informe um estoque válido", "erro");
+      }
+
+      setSalvando(true);
+
       const formData = new FormData();
 
-      formData.append("nome", produto.nome);
-      formData.append("marca", produto.marca);
-      formData.append("categoria", produto.categoria);
-      formData.append("descricao", produto.descricao);
+      formData.append("nome", produto.nome.trim());
+      formData.append("marca", produto.marca.trim());
+      formData.append("categoria", produto.categoria.trim());
+      formData.append("descricao", produto.descricao.trim());
       formData.append("preco", produto.preco.toString());
       formData.append("estoque", produto.estoque.toString());
       formData.append("avaliacao", produto.avaliacao.toString());
 
-      if (imagem) {
-        formData.append("arquivo", imagem);
-      }
+      imagens.forEach((imagem) => {
+        formData.append("arquivos", imagem);
+      });
 
       await axios.post("/api/criar", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
+        withCredentials: true,
       });
 
-      alert("Produto criado com imagem!");
+      exibirAlerta("Produto cadastrado!", "sucesso");
 
-      setProduto({
-        nome: "",
-        marca: "",
-        categoria: "",
-        descricao: "",
-        preco: 0,
-        estoque: 0,
-        promocao: false,
-        avaliacao: 0,
-      });
+      setProduto(produtoInicial);
+      setImagens([]);
 
-      setImagem(null);
+      preview.forEach((img) => URL.revokeObjectURL(img));
+      setPreview([]);
 
-      carrega_produtos();
+      carregarProdutos();
     } catch (err) {
       console.error(err);
-      alert("Erro ao cadastrar");
+      exibirAlerta("Erro ao cadastrar produto", "erro");
+    } finally {
+      setSalvando(false);
     }
-  };
+  }
 
-  const excluirProduto = async (id: number) => {
+  async function excluirProduto(id: number) {
     try {
+      const confirmar = confirm("Tem certeza que deseja excluir este produto?");
+
+      if (!confirmar) return;
+
       await axios.delete("/api/excluir", {
-        params: { id },
+        params: {
+          id,
+        },
+        withCredentials: true,
       });
 
       setProdutos((prev) => prev.filter((p) => p.id !== id));
+
+      exibirAlerta("Produto excluído!", "sucesso");
     } catch (err) {
       console.error(err);
-      alert("Erro ao excluir produto");
+      exibirAlerta("Erro ao excluir produto", "erro");
     }
-  };
+  }
 
-  const mudaImagem = (e: any, produto_id: number) => {
-    const arquivo_selecionado = e.target.files[0];
-    setImagemParaSalvar(arquivo_selecionado);
-    setProdutoParaSalvarId(produto_id);
-  };
-
-  const faz_upload = async () => {
-    if (!produtoParaSalvarId || !imagemParaSalvar) {
-      return alert("Por favor, selecione um arquivo primeiro.");
-    }
-
-    const formulario = new FormData();
-    formulario.append("arquivo", imagemParaSalvar);
-    formulario.append("produto_id", produtoParaSalvarId.toString());
-
+  async function adicionarImagemProduto(
+    e: React.ChangeEvent<HTMLInputElement>,
+    produtoId: number,
+  ) {
     try {
-      await axios.post("/api/upload", formulario, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const files = Array.from(e.target.files || []);
 
-      setImagemParaSalvar(null);
-      setProdutoParaSalvarId(null);
-      carrega_produtos();
-      alert("Imagem salva com sucesso!");
+      if (files.length === 0) return;
+
+      const imagensValidas = files.filter((file) =>
+        file.type.startsWith("image/"),
+      );
+
+      if (imagensValidas.length === 0) {
+        e.target.value = "";
+        return exibirAlerta("Selecione apenas imagens", "erro");
+      }
+
+      for (const file of imagensValidas) {
+        const formulario = new FormData();
+
+        formulario.append("arquivo", file);
+        formulario.append("produto_id", produtoId.toString());
+
+        await axios.post("/api/upload", formulario, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        });
+      }
+
+      exibirAlerta("Imagem adicionada!", "sucesso");
+
+      e.target.value = "";
+
+      carregarProdutos();
     } catch (err) {
-      console.log(err);
-      alert("Não foi possível salvar a imagem no servidor");
+      console.error(err);
+      exibirAlerta("Erro ao adicionar imagem", "erro");
     }
-  };
+  }
+
+  function formatarPrecoInput(valor: number) {
+    if (valor === 0) return "";
+
+    return valor.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  }
+
+  function alterarPreco(valorDigitado: string) {
+    const somenteNumeros = valorDigitado.replace(/\D/g, "");
+    const numero = Number(somenteNumeros) / 100;
+
+    setProduto({
+      ...produto,
+      preco: numero,
+    });
+  }
+
+  function imagemPrincipalProduto(produto: Produto) {
+    if (produto.imagens?.[0]?.arquivo?.link) {
+      return produto.imagens[0].arquivo.link;
+    }
+
+    if (produto.imagem?.link) {
+      return produto.imagem.link;
+    }
+
+    return null;
+  }
 
   useEffect(() => {
     verificarAdmin();
@@ -152,38 +287,73 @@ const AdicionarItens = () => {
 
   useEffect(() => {
     if (autorizado) {
-      carrega_produtos();
+      carregarProdutos();
     }
   }, [limit, buscaAdmin, autorizado]);
 
-  if (carregando) return <h1>Verificando acesso...</h1>;
-  if (!autorizado) return null;
+  useEffect(() => {
+    return () => {
+      preview.forEach((img) => {
+        URL.revokeObjectURL(img);
+      });
+    };
+  }, [preview]);
+
+  if (carregando) {
+    return (
+      <div
+        className={`${style.adicionarContainer} ${tema === "dark" ? "dark" : ""}`}
+      >
+        <h1>Verificando acesso...</h1>
+      </div>
+    );
+  }
+
+  if (!autorizado) {
+    return null;
+  }
 
   return (
-    <div className={style["adicionar-container"]}>
+    <div
+      className={`${style.adicionarContainer} ${tema === "dark" ? "dark" : ""}`}
+    >
+      <button className={style.botaoVoltar} onClick={() => router.push("/")}>
+        ← Voltar para início
+      </button>
+
       <h1>Adicionar produto ao catálogo</h1>
 
       <input
-        className={style["buscaAdmin"]}
+        className={style.buscaAdmin}
         type="text"
         placeholder="Buscar produto para excluir..."
         value={buscaAdmin}
         onChange={(e) => setBuscaAdmin(e.target.value)}
       />
 
-      <div className={style["formulario"]}>
+      <div className={style.formulario}>
         <input
           type="text"
           placeholder="Nome do produto"
           value={produto.nome}
-          onChange={(e) => setProduto({ ...produto, nome: e.target.value })}
+          onChange={(e) =>
+            setProduto({
+              ...produto,
+              nome: e.target.value,
+            })
+          }
         />
 
         <input
           type="text"
           placeholder="Marca"
           value={produto.marca}
-          onChange={(e) => setProduto({ ...produto, marca: e.target.value })}
+          onChange={(e) =>
+            setProduto({
+              ...produto,
+              marca: e.target.value,
+            })
+          }
         />
 
         <input
@@ -191,7 +361,10 @@ const AdicionarItens = () => {
           placeholder="Categoria"
           value={produto.categoria}
           onChange={(e) =>
-            setProduto({ ...produto, categoria: e.target.value })
+            setProduto({
+              ...produto,
+              categoria: e.target.value,
+            })
           }
         />
 
@@ -199,107 +372,133 @@ const AdicionarItens = () => {
           placeholder="Descrição do produto"
           value={produto.descricao}
           onChange={(e) =>
-            setProduto({ ...produto, descricao: e.target.value })
+            setProduto({
+              ...produto,
+              descricao: e.target.value,
+            })
           }
         />
 
         <input
           type="text"
           placeholder="Preço (R$)"
-          value={
-            produto.preco === 0
-              ? ""
-              : produto.preco.toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })
-          }
-          onChange={(e) => {
-            let valor = e.target.value;
-            valor = valor.replace(/\D/g, "");
-            const numero = Number(valor) / 100;
-            setProduto({ ...produto, preco: numero });
-          }}
+          value={formatarPrecoInput(produto.preco)}
+          onChange={(e) => alterarPreco(e.target.value)}
         />
 
         <input
           type="number"
           placeholder="Estoque"
+          min={0}
           value={produto.estoque === 0 ? "" : produto.estoque}
           onChange={(e) =>
-            setProduto({ ...produto, estoque: Number(e.target.value) })
+            setProduto({
+              ...produto,
+              estoque: Number(e.target.value),
+            })
           }
         />
-
-        <label>Avaliação:</label>
-        <select
-          value={produto.avaliacao}
-          onChange={(e) =>
-            setProduto({ ...produto, avaliacao: Number(e.target.value) })
-          }
-        >
-          {[0, 1, 2, 3, 4, 5].map((v) => (
-            <option key={v} value={v}>
-              {v} ⭐
-            </option>
-          ))}
-        </select>
 
         <input
           type="file"
-          onChange={(e) => setImagem(e.target.files?.[0] || null)}
+          multiple
+          accept="image/*"
+          onChange={adicionarImagens}
         />
 
-        <button onClick={cadastra_produto}>Adicionar produto</button>
+        {preview.length > 0 && (
+          <div className={style.previewContainer}>
+            {preview.map((img, index) => (
+              <div key={index} className={style.previewItem}>
+                <img
+                  src={img}
+                  className={style.previewImagem}
+                  alt={`Prévia ${index + 1}`}
+                />
+
+                <button
+                  type="button"
+                  className={style.botaoRemoverImagem}
+                  onClick={() => removerImagem(index)}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <button
+          disabled={salvando}
+          className={style.botao}
+          onClick={cadastrarProduto}
+        >
+          {salvando ? "Salvando..." : "Adicionar produto"}
+        </button>
       </div>
 
       <h2>Produtos cadastrados</h2>
 
       <div className={style["produtos-cadastrados"]}>
-        {produtos.map((p) => (
-          <div key={p.id} className={style["produto-item"]}>
-            {p.imagem ? (
-              <img src={p.imagem.link} alt={p.nome} width={80} />
-            ) : (
-              <div className={style["upload-box"]}>
-                <input type="file" onChange={(e) => mudaImagem(e, p.id)} />
-                {produtoParaSalvarId === p.id && (
-                  <button onClick={faz_upload}>Confirmar Upload</button>
-                )}
+        {produtos.map((p) => {
+          const imagem = imagemPrincipalProduto(p);
+
+          return (
+            <div key={p.id} className={style.produtoItem}>
+              {imagem ? (
+                <img src={`/${imagem}`} alt={p.nome} />
+              ) : (
+                <div className={style["upload-box"]}>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={(e) => adicionarImagemProduto(e, p.id)}
+                  />
+                </div>
+              )}
+
+              <div className={style.infoProduto}>
+                <h3>{p.nome}</h3>
+
+                <p>
+                  {p.preco.toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  })}
+                </p>
+
+                <p>
+                  Avaliação:{" "}
+                  {Number(p.avaliacao || 0).toLocaleString("pt-BR", {
+                    minimumFractionDigits: 1,
+                    maximumFractionDigits: 1,
+                  })}
+                </p>
               </div>
-            )}
 
-            <div>
-              <h3>{p.nome}</h3>
-              <p>R$ {p.preco.toFixed(2)}</p>
-              <p>{"⭐".repeat(Math.floor(p.avaliacao))}</p>
+              <button
+                onClick={() => excluirProduto(p.id)}
+                className={style.excluir}
+              >
+                Excluir
+              </button>
             </div>
-
-            <button
-              onClick={() => {
-                if (confirm("Tem certeza que deseja excluir?")) {
-                  excluirProduto(p.id);
-                }
-              }}
-              className={style["excluir"]}
-            >
-              Excluir
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <button
-        className={style["carregarMais"]}
+        className={style.carregarMais}
         onClick={() => setLimit(limit + 20)}
       >
         Carregar mais produtos
       </button>
     </div>
   );
-};
+}
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const token = req.cookies.token || null;
   let user = null;
 
@@ -321,5 +520,3 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     props: {},
   };
 };
-
-export default AdicionarItens;

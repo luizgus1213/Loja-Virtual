@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./menu.module.css";
-
+import { useTema } from "@/contexts/ThemeContext";
+import { useRouter } from "next/router";
 const MenuHamburguer = () => {
   const [aberto, setAberto] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const { tema, setTema } = useTema();
+  const router = useRouter();
 
   const carregarUsuario = async () => {
     try {
@@ -28,7 +31,7 @@ const MenuHamburguer = () => {
         className={styles.botao}
         onClick={() => {
           setAberto(true);
-          carregarUsuario(); // 🔥 atualiza ao abrir
+          carregarUsuario();
         }}
       >
         ☰
@@ -41,6 +44,18 @@ const MenuHamburguer = () => {
           <div className={styles.menu}>
             <button className={styles.fechar} onClick={() => setAberto(false)}>
               ✕
+            </button>
+
+            <button
+              className={styles.botaoLogin}
+              onClick={() => {
+                if (tema === "light") setTema("dark");
+                else setTema("light");
+              }}
+            >
+              {tema === "light"
+                ? "Definir Tema como Dark"
+                : "Definir tema como Light"}
             </button>
 
             {user ? (
@@ -56,15 +71,86 @@ const MenuHamburguer = () => {
                 />
                 <h2 className={styles.nome}>{user.nome}</h2>
 
-                <button
-                  className={styles.botaoPerfil}
-                  onClick={() => (window.location.href = "/perfil")}
-                >
-                  Meu Perfil
-                </button>
+                <div className={styles.areaBotoesUsuario}>
+                  <button
+                    type="button"
+                    className={styles.botaoPerfil}
+                    onClick={() => {
+                      setAberto(false);
+                      router.push("/perfil");
+                    }}
+                  >
+                    Meu Perfil
+                  </button>
+
+                  <button
+                    type="button"
+                    className={styles.botaoFavoritos}
+                    onClick={() => {
+                      setAberto(false);
+                      router.push("/favoritos");
+                    }}
+                  >
+                    Favoritos
+                  </button>
+
+                  <button
+                    type="button"
+                    className={styles.botaoHistorico}
+                    onClick={() => {
+                      setAberto(false);
+                      router.push("/historico");
+                    }}
+                  >
+                    Compras
+                  </button>
+                  {user?.acesso === "admin" && (
+                    <>
+                      <button
+                        className={styles.botaoAdmin}
+                        onClick={() => {
+                          setAberto(false);
+                          router.push("/admin");
+                        }}
+                      >
+                        Painel admin
+                      </button>
+
+                      <button
+                        className={styles.botaoAdmin}
+                        onClick={() => {
+                          setAberto(false);
+                          router.push("/admin/pedidos");
+                        }}
+                      >
+                        Gerenciar pedidos
+                      </button>
+
+                      <button
+                        className={styles.botaoAdmin}
+                        onClick={() => {
+                          setAberto(false);
+                          router.push("/admin/cupons");
+                        }}
+                      >
+                        Gerenciar cupons
+                      </button>
+
+                      <button
+                        className={styles.botaoAdmin}
+                        onClick={() => {
+                          setAberto(false);
+                          router.push("/admin/notificacoes");
+                        }}
+                      >
+                        Enviar notificações
+                      </button>
+                    </>
+                  )}
+                </div>
 
                 <button
-                  className={styles.botaoLogin}
+                  className={styles.botaoSair}
                   onClick={async () => {
                     await axios.post("/api/auth/logout");
                     setUser(null);

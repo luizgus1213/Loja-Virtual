@@ -1,0 +1,328 @@
+.page {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(52, 131, 250, 0.12),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at bottom right,
+      rgba(124, 58, 237, 0.1),
+      transparent 32%
+    ),
+    var(--background);
+  color: var(--foreground);
+  padding: 34px 18px 70px;
+}
+
+.container {
+  width: 100%;
+  max-width: 1220px;
+  margin: 0 auto;
+}
+
+.botaoVoltar {
+  margin-bottom: 20px;
+  padding: 11px 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--foreground);
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: 0.2s;
+}
+
+.botaoVoltar:hover {
+  border-color: var(--button);
+  color: var(--button);
+  transform: translateY(-2px);
+}
+
+.header {
+  margin-bottom: 24px;
+  padding: 26px;
+  border-radius: 28px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.header span {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: var(--button);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.header h1 {
+  margin: 0 0 8px;
+  font-size: clamp(30px, 4vw, 46px);
+  font-weight: 900;
+  letter-spacing: -1px;
+}
+
+.header p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.formCard,
+.listaCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  padding: 22px;
+}
+
+.formCard {
+  position: sticky;
+  top: 90px;
+}
+
+.formCard h2,
+.listaCard h2 {
+  margin: 0 0 18px;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.formCard label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 13px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.formCard input,
+.formCard select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--input);
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 800;
+  outline: none;
+}
+
+.formCard input:focus,
+.formCard select:focus {
+  border-color: var(--button);
+}
+
+.formCard button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 15px;
+  background: var(--button);
+  color: white;
+  font-weight: 900;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.formCard button:hover:not(:disabled) {
+  background: var(--button-hover);
+  transform: translateY(-2px);
+}
+
+.formCard button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cupomCard {
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--input);
+}
+
+.cupomTopo {
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.cupomTopo div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cupomTopo strong {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--button);
+}
+
+.cupomTopo button {
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--foreground);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.ativo,
+.inativo {
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.ativo {
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.inativo {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.infoGrid p {
+  margin: 0;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+
+.infoGrid span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.infoGrid strong {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.expira {
+  margin: 12px 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.botaoExcluir {
+  margin-top: 14px;
+  padding: 11px 14px;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 13px;
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.vazio {
+  color: var(--text-secondary);
+  font-weight: 800;
+}
+
+.loadingBox {
+  min-height: 75vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.loadingBox h1 {
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.spinner {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: 4px solid var(--border);
+  border-top-color: var(--button);
+  animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .formCard {
+    position: static;
+  }
+
+  .infoGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .page {
+    padding: 24px 14px 56px;
+  }
+
+  .header,
+  .formCard,
+  .listaCard {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .cupomTopo {
+    flex-direction: column;
+  }
+}

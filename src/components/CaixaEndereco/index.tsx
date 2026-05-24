@@ -1,7 +1,8 @@
 import styles from "./styles.module.css";
 import { useState } from "react";
 import axios from "axios";
-
+import Alerta from "@/components/Alarmebonito";
+import { useAlerta } from "@/contexts/AlertaContext";
 interface EnderecoType {
   id?: number;
 
@@ -33,13 +34,15 @@ const textosComponente = {
     bt_salvar: "Salvar alterações",
   },
 };
-
 const CaixaEndereco = ({
   endereco,
   modo = "atualizar",
   carregarUsuario,
 }: CaixaEnderecoProps) => {
   const [loading, setLoading] = useState(false);
+  const { exibirAlerta } = useAlerta();
+
+  const [visivel, setVisivel] = useState(false);
 
   const [enderecoAtual, setEnderecoAtual] = useState<EnderecoType>({
     id: endereco?.id,
@@ -52,6 +55,34 @@ const CaixaEndereco = ({
     bairro: endereco?.bairro || "",
     cep: endereco?.cep || "",
   });
+
+  const buscarCEP = async (cep: string) => {
+    try {
+      const cepLimpo = cep.replace(/\D/g, "");
+
+      if (cepLimpo.length !== 8) return;
+
+      const res = await axios.get(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+
+      if (res.data.erro) {
+        exibirAlerta("CEP não encontrado", "erro");
+
+        return;
+      }
+
+      setEnderecoAtual((prev) => ({
+        ...prev,
+        rua: res.data.logradouro || "",
+        bairro: res.data.bairro || "",
+        cidade: res.data.localidade || "",
+        estado: res.data.uf || "",
+      }));
+    } catch (err) {
+      console.log(err);
+
+      exibirAlerta("Erro ao buscar CEP", "erro");
+    }
+  };
 
   const salvarEndereco = async () => {
     try {
@@ -66,34 +97,37 @@ const CaixaEndereco = ({
         !enderecoAtual.bairro ||
         !enderecoAtual.cep
       ) {
-        return alert("Preencha tudo");
+        exibirAlerta("Preencha todos os campos", "erro");
+        return;
       }
       if (enderecoAtual.cep.replace(/\D/g, "").length !== 8) {
-        return alert("CEP inválido");
+        exibirAlerta("CEP inválido", "erro");
+        return;
       }
 
       if (enderecoAtual.estado.length !== 2) {
-        return alert("Estado inválido");
+        exibirAlerta("Estado inválido", "erro");
+        return;
       }
       if (modo === "cadastrar") {
         await axios.post("/api/endereco/criar", enderecoAtual, {
           withCredentials: true,
         });
 
-        alert("Endereço criado!");
+        exibirAlerta("Endereço criado!", "sucesso");
       } else {
         await axios.post("/api/endereco/atualizar", enderecoAtual, {
           withCredentials: true,
         });
 
-        alert("Endereço atualizado!");
+        exibirAlerta("Endereço atualizado!", "sucesso");
       }
 
       carregarUsuario?.();
     } catch (err) {
       console.log(err);
 
-      alert("Erro ao salvar endereço");
+      exibirAlerta("Erro ao salvar endereço", "erro");
     } finally {
       setLoading(false);
     }
@@ -118,13 +152,14 @@ const CaixaEndereco = ({
         },
       );
 
-      alert("Endereço excluído!");
+      exibirAlerta("Endereço excluído!", "sucesso");
 
       carregarUsuario?.();
+      window.location.reload();
     } catch (err) {
       console.log(err);
 
-      alert("Erro ao excluir");
+      exibirAlerta("Erro ao excluir endereço", "erro");
     }
   };
 
@@ -164,6 +199,10 @@ const CaixaEndereco = ({
               ...enderecoAtual,
               cep: valor,
             });
+
+            if (valor.replace(/\D/g, "").length === 8) {
+              buscarCEP(valor);
+            }
           }}
         />
 

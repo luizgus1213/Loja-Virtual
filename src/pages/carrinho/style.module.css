@@ -1,0 +1,1025 @@
+.page {
+  min-height: 100vh;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(52, 131, 250, 0.12),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at bottom right,
+      rgba(124, 58, 237, 0.1),
+      transparent 34%
+    ),
+    var(--background);
+
+  color: var(--foreground);
+
+  padding: 34px 18px 60px 18px;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+
+  margin: 0 auto;
+}
+
+.botaoVoltar {
+  margin-bottom: 20px;
+
+  padding: 11px 16px;
+
+  border: 1px solid var(--border);
+  border-radius: 12px;
+
+  background: var(--card);
+  color: var(--foreground);
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.botaoVoltar:hover {
+  border-color: var(--button);
+  color: var(--button);
+  transform: translateY(-2px);
+}
+
+.header {
+  margin-bottom: 24px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  gap: 20px;
+
+  flex-wrap: wrap;
+}
+
+.header span {
+  display: inline-block;
+
+  margin-bottom: 8px;
+
+  padding: 6px 12px;
+
+  border-radius: 999px;
+
+  background: rgba(52, 131, 250, 0.12);
+  color: var(--button);
+
+  border: 1px solid rgba(52, 131, 250, 0.25);
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.header h1 {
+  margin: 0 0 6px 0;
+
+  font-size: clamp(30px, 5vw, 46px);
+  font-weight: 900;
+
+  letter-spacing: -1px;
+}
+
+.header p {
+  margin: 0;
+
+  color: var(--text-secondary);
+
+  font-weight: 600;
+}
+
+.botaoSelecionar {
+  padding: 12px 16px;
+
+  border: 1px solid var(--border);
+  border-radius: 14px;
+
+  background: var(--card);
+  color: var(--foreground);
+
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.botaoSelecionar:hover {
+  border-color: var(--button);
+  color: var(--button);
+
+  transform: translateY(-2px);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+
+  gap: 22px;
+
+  align-items: flex-start;
+}
+
+.listaItens {
+  display: flex;
+  flex-direction: column;
+
+  gap: 16px;
+}
+
+.itemCard {
+  display: grid;
+  grid-template-columns: 40px 110px 1fr auto;
+
+  align-items: center;
+
+  gap: 16px;
+
+  padding: 18px;
+
+  border: 1px solid var(--border);
+  border-radius: 24px;
+
+  background: var(--card);
+
+  box-shadow: var(--shadow);
+
+  transition: 0.2s;
+}
+
+.itemCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(52, 131, 250, 0.35);
+}
+
+.itemSelecionado {
+  border-color: var(--button);
+  background: rgba(52, 131, 250, 0.08);
+}
+
+.checkboxArea {
+  width: 28px;
+  height: 28px;
+
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+.checkboxArea input {
+  position: absolute;
+
+  opacity: 0;
+  pointer-events: none;
+}
+
+.checkboxArea span {
+  width: 24px;
+  height: 24px;
+
+  border-radius: 8px;
+
+  border: 2px solid var(--border);
+
+  background: var(--input);
+
+  transition: 0.2s;
+}
+
+.checkboxArea input:checked + span {
+  background: var(--button);
+  border-color: var(--button);
+}
+
+.checkboxArea input:checked + span::after {
+  content: "✓";
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.imagemProduto {
+  width: 110px;
+  height: 110px;
+
+  object-fit: contain;
+
+  padding: 8px;
+
+  border-radius: 18px;
+
+  background: var(--input);
+  border: 1px solid var(--border);
+}
+
+.infoProduto h2 {
+  margin: 0 0 6px 0;
+
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.marcaCategoria {
+  margin: 0 0 12px 0;
+
+  color: var(--text-secondary);
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.detalhesItem {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  margin-bottom: 12px;
+}
+
+.detalhesItem span {
+  padding: 7px 10px;
+
+  border-radius: 999px;
+
+  background: var(--input);
+  border: 1px solid var(--border);
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.precos {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.precos strong {
+  font-size: 20px;
+  font-weight: 900;
+
+  color: var(--button);
+}
+
+.precos span {
+  color: var(--text-secondary);
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.acoesItem {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.botaoVer,
+.botaoRemover {
+  min-width: 120px;
+
+  padding: 11px 14px;
+
+  border: none;
+  border-radius: 14px;
+
+  color: white;
+
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.botaoVer {
+  background: #3483fa;
+}
+
+.botaoRemover {
+  background: #dc2626;
+}
+
+.botaoVer:hover,
+.botaoRemover:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.botaoRemover:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.resumoBox {
+  position: sticky;
+  top: 24px;
+
+  padding: 22px;
+
+  border: 1px solid var(--border);
+  border-radius: 26px;
+
+  background: var(--card);
+
+  box-shadow: var(--shadow);
+}
+
+.resumoBox h2 {
+  margin: 0 0 18px 0;
+
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.linhaResumo,
+.linhaResumoDesconto {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+
+  padding: 12px 0;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.linhaResumo span,
+.linhaResumoDesconto span {
+  color: var(--text-secondary);
+
+  font-weight: 700;
+}
+
+.linhaResumo strong,
+.linhaResumoDesconto strong {
+  font-weight: 900;
+}
+
+.linhaResumoDesconto strong {
+  color: #22c55e;
+}
+
+.cupomArea {
+  margin-top: 18px;
+}
+
+.cupomArea label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: var(--text-secondary);
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.cupomLinha {
+  display: grid;
+  grid-template-columns: 1fr auto;
+
+  gap: 8px;
+}
+
+.cupomLinha input {
+  width: 100%;
+
+  padding: 12px;
+
+  border: 1px solid var(--border);
+  border-radius: 14px;
+
+  background: var(--input);
+  color: var(--foreground);
+
+  outline: none;
+
+  font-weight: 700;
+}
+
+.cupomLinha input:focus {
+  border-color: var(--button);
+  box-shadow: 0 0 0 3px rgba(52, 131, 250, 0.12);
+}
+
+.cupomLinha button {
+  padding: 12px 14px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: var(--button);
+  color: white;
+
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.cupomLinha button:hover:not(:disabled) {
+  background: var(--button-hover);
+  transform: translateY(-2px);
+}
+
+.cupomLinha button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.cupomAplicado {
+  margin-top: 14px;
+
+  padding: 14px;
+
+  border-radius: 16px;
+
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.28);
+}
+
+.cupomAplicado span {
+  display: block;
+
+  color: var(--text-secondary);
+
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.cupomAplicado strong {
+  display: block;
+
+  margin: 4px 0 10px 0;
+
+  color: #22c55e;
+
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.cupomAplicado button {
+  width: 100%;
+
+  padding: 9px 12px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #475569;
+  color: white;
+
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.totalFinal {
+  margin-top: 18px;
+  padding: 16px;
+
+  border-radius: 18px;
+
+  background: rgba(52, 131, 250, 0.12);
+  border: 1px solid rgba(52, 131, 250, 0.28);
+}
+
+.totalFinal span {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: var(--text-secondary);
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.totalFinal strong {
+  color: var(--button);
+
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.botaoFinalizar {
+  width: 100%;
+
+  margin-top: 16px;
+
+  padding: 15px;
+
+  border: none;
+  border-radius: 18px;
+
+  background: linear-gradient(135deg, var(--button), var(--button-hover));
+  color: white;
+
+  font-size: 15px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+
+  box-shadow: 0 10px 24px rgba(52, 131, 250, 0.18);
+}
+
+.botaoFinalizar:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.botaoFinalizar:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.aviso {
+  margin: 12px 0 0 0;
+
+  color: var(--text-secondary);
+
+  font-size: 12px;
+  line-height: 1.4;
+
+  text-align: center;
+}
+
+.loadingBox,
+.vazio {
+  min-height: 75vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  text-align: center;
+}
+
+.vazio h1,
+.loadingBox h1 {
+  margin: 0;
+
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.vazio p {
+  margin: 0;
+
+  color: var(--text-secondary);
+
+  font-weight: 600;
+}
+
+.vazio button {
+  margin-top: 8px;
+
+  padding: 13px 18px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: var(--button);
+  color: white;
+
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.vazio button:hover {
+  background: var(--button-hover);
+  transform: translateY(-2px);
+}
+
+.spinner {
+  width: 46px;
+  height: 46px;
+
+  border-radius: 999px;
+
+  border: 4px solid var(--border);
+  border-top-color: var(--button);
+
+  animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1050px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .resumoBox {
+    position: static;
+    order: -1;
+  }
+
+  .itemCard {
+    grid-template-columns: 40px 95px 1fr;
+  }
+
+  .acoesItem {
+    grid-column: 1 / -1;
+    flex-direction: row;
+  }
+
+  .botaoVer,
+  .botaoRemover {
+    width: 100%;
+  }
+}
+
+@media (max-width: 650px) {
+  .page {
+    padding: 22px 14px 50px 14px;
+  }
+
+  .itemCard {
+    grid-template-columns: 32px 82px 1fr;
+
+    padding: 14px;
+    border-radius: 20px;
+    gap: 12px;
+  }
+
+  .imagemProduto {
+    width: 82px;
+    height: 82px;
+  }
+
+  .infoProduto h2 {
+    font-size: 17px;
+  }
+
+  .detalhesItem span {
+    font-size: 12px;
+  }
+
+  .header {
+    align-items: flex-start;
+  }
+
+  .botaoSelecionar {
+    width: 100%;
+  }
+
+  .cupomLinha {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 430px) {
+  .itemCard {
+    grid-template-columns: 1fr;
+
+    text-align: center;
+  }
+
+  .checkboxArea {
+    margin: 0 auto;
+  }
+
+  .imagemProduto {
+    margin: 0 auto;
+  }
+
+  .acoesItem {
+    flex-direction: column;
+  }
+
+  .detalhesItem {
+    justify-content: center;
+  }
+}
+.produtosAntesFinalizar {
+  margin-top: 18px;
+
+  padding: 14px;
+
+  border-radius: 18px;
+
+  background: var(--input);
+  border: 1px solid var(--border);
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.produtosAntesFinalizar h3 {
+  margin: 0;
+
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.produtosAntesFinalizar p {
+  margin: 0;
+
+  color: var(--text-secondary);
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.produtoResumo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px;
+
+  border-radius: 14px;
+
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+
+.produtoResumo img {
+  width: 48px;
+  height: 48px;
+
+  object-fit: contain;
+
+  border-radius: 10px;
+
+  background: var(--input);
+  border: 1px solid var(--border);
+
+  padding: 4px;
+}
+
+.produtoResumo div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.produtoResumo strong {
+  font-size: 13px;
+  font-weight: 900;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.produtoResumo span {
+  color: var(--button);
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.produtoResumo small {
+  color: var(--text-secondary);
+
+  font-size: 12px;
+  font-weight: 700;
+}
+.produtosTopo {
+  margin-bottom: 22px;
+
+  padding: 18px;
+
+  border: 1px solid var(--border);
+  border-radius: 24px;
+
+  background: var(--card);
+
+  box-shadow: var(--shadow);
+}
+
+.produtosTopoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 14px;
+
+  margin-bottom: 14px;
+
+  flex-wrap: wrap;
+}
+
+.produtosTopoHeader h2 {
+  margin: 0;
+
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.produtosTopoHeader span {
+  padding: 7px 12px;
+
+  border-radius: 999px;
+
+  background: rgba(52, 131, 250, 0.12);
+  color: var(--button);
+
+  border: 1px solid rgba(52, 131, 250, 0.25);
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.produtosTopoLista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+
+  gap: 12px;
+}
+
+.produtoTopoCard {
+  width: 100%;
+
+  padding: 10px;
+
+  border: 1px solid var(--border);
+  border-radius: 16px;
+
+  background: var(--input);
+  color: var(--foreground);
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.produtoTopoCard:hover {
+  border-color: var(--button);
+  transform: translateY(-2px);
+}
+
+.produtoTopoSelecionado {
+  border-color: var(--button);
+  background: rgba(52, 131, 250, 0.12);
+}
+
+.produtoTopoCard img {
+  width: 52px;
+  height: 52px;
+
+  object-fit: contain;
+
+  border-radius: 12px;
+
+  background: var(--card);
+  border: 1px solid var(--border);
+
+  padding: 5px;
+
+  flex-shrink: 0;
+}
+
+.produtoTopoCard div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.produtoTopoCard strong {
+  font-size: 13px;
+  font-weight: 900;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.produtoTopoCard span {
+  color: var(--button);
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+@media (max-width: 650px) {
+  .produtosTopo {
+    padding: 14px;
+    border-radius: 20px;
+  }
+
+  .produtosTopoLista {
+    grid-template-columns: 1fr;
+  }
+}
+.enderecoBox {
+  margin-top: 18px;
+
+  padding: 14px;
+
+  border-radius: 18px;
+
+  background: var(--input);
+  border: 1px solid var(--border);
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.enderecoBox label {
+  color: var(--text-secondary);
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.enderecoBox select {
+  width: 100%;
+
+  padding: 12px;
+
+  border: 1px solid var(--border);
+  border-radius: 14px;
+
+  background: var(--card);
+  color: var(--foreground);
+
+  font-weight: 700;
+
+  outline: none;
+}
+
+.enderecoBox select:focus {
+  border-color: var(--button);
+  box-shadow: 0 0 0 3px rgba(52, 131, 250, 0.12);
+}
+
+.semEndereco {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.semEndereco p {
+  margin: 0;
+
+  color: var(--text-secondary);
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.semEndereco button {
+  padding: 12px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: var(--button);
+  color: white;
+
+  font-weight: 900;
+
+  cursor: pointer;
+}

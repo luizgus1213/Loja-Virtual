@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Product from "@/models/Produto";
 import Arquivo from "@/models/Arquivo";
+import "@/models";
+import ProdutoImagem from "@/models/ProdutoImagem";
 
 export default async function handler(
   req: NextApiRequest,
@@ -16,10 +18,19 @@ export default async function handler(
     const produto = await Product.findByPk(Number(id), {
       include: [
         {
-          model: Arquivo,
-          as: "imagem",
+          model: ProdutoImagem,
+          as: "imagens",
+
+          include: [
+            {
+              model: Arquivo,
+              as: "arquivo",
+            },
+          ],
         },
       ],
+
+      order: [[{ model: ProdutoImagem, as: "imagens" }, "ordem", "ASC"]],
     });
 
     if (!produto) {
@@ -28,7 +39,10 @@ export default async function handler(
 
     return res.status(200).json(produto);
   } catch (err) {
-    console.log("ERRO API PRODUTO:", err);
-    return res.status(500).json(null);
+    console.error("ERRO INTERNO:", err);
+
+    return res.status(500).json({
+      erro: "Erro interno no servidor",
+    });
   }
 }

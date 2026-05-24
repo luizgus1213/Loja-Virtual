@@ -25,7 +25,11 @@ export default async function handler(
     senha + "melao",
     user.get("senha") as string,
   );
-
+  if (!user.get("email_verificado")) {
+    return res.status(403).json({
+      erro: "Verifique seu email antes de entrar",
+    });
+  }
   if (!email.includes("@")) {
     return res.status(400).json({ erro: "Email inválido" });
   }
@@ -43,7 +47,8 @@ export default async function handler(
     "Set-Cookie",
     serialize("token", token, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 2,
     }),

@@ -1,0 +1,376 @@
+.container {
+  width: 100%;
+  max-width: 950px;
+
+  margin: 40px auto;
+  padding: 20px;
+
+  color: var(--foreground);
+}
+
+.naoEncontrado {
+  min-height: 70vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 16px;
+
+  color: var(--foreground);
+}
+
+.naoEncontrado button {
+  padding: 12px 18px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: var(--button);
+  color: white;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.naoEncontrado button:hover {
+  background: var(--button-hover);
+  transform: translateY(-2px);
+}
+
+.botaoVoltar {
+  margin-bottom: 20px;
+
+  padding: 11px 16px;
+
+  border: 1px solid var(--border);
+  border-radius: 12px;
+
+  background: var(--card);
+  color: var(--foreground);
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.botaoVoltar:hover {
+  border-color: var(--button);
+  color: var(--button);
+
+  transform: translateY(-2px);
+}
+
+.cardResumo {
+  background: var(--card);
+
+  border: 1px solid var(--border);
+  border-radius: 24px;
+
+  padding: 24px;
+
+  margin-bottom: 24px;
+
+  box-shadow: var(--shadow);
+}
+
+.topoPedido {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 20px;
+
+  flex-wrap: wrap;
+}
+
+.topoPedido h1 {
+  margin: 0 0 8px 0;
+
+  font-size: 32px;
+  font-weight: 900;
+}
+
+.topoPedido p {
+  margin: 0;
+
+  color: var(--text-secondary);
+}
+
+.cardResumo hr {
+  margin: 22px 0;
+
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+.status {
+  padding: 9px 14px;
+
+  border-radius: 999px;
+
+  background: rgba(52, 131, 250, 0.12);
+  color: var(--button);
+
+  border: 1px solid rgba(52, 131, 250, 0.25);
+
+  font-weight: 900;
+  font-size: 13px;
+
+  white-space: nowrap;
+}
+
+.status_aguardando_pagamento {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.13);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.status_pago {
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.13);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.status_preparando {
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.13);
+  border-color: rgba(96, 165, 250, 0.3);
+}
+
+.status_enviado {
+  color: #a78bfa;
+  background: rgba(167, 139, 250, 0.13);
+  border-color: rgba(167, 139, 250, 0.3);
+}
+
+.status_entregue {
+  color: #14b8a6;
+  background: rgba(20, 184, 166, 0.13);
+  border-color: rgba(20, 184, 166, 0.3);
+}
+
+.status_cancelado,
+.status_expirado {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.13);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.resumoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+
+  gap: 14px;
+}
+
+.resumoItem,
+.resumoTotal {
+  padding: 15px;
+
+  border-radius: 16px;
+
+  background: var(--input);
+  border: 1px solid var(--border);
+}
+
+.resumoItem span,
+.resumoTotal span {
+  display: block;
+
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 900;
+
+  margin-bottom: 7px;
+}
+
+.resumoItem strong,
+.resumoTotal strong {
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.resumoDesconto {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.28);
+}
+
+.resumoDesconto strong {
+  color: #22c55e;
+}
+
+.resumoTotal {
+  background: rgba(52, 131, 250, 0.12);
+  border-color: rgba(52, 131, 250, 0.28);
+}
+
+.resumoTotal strong {
+  font-size: 22px;
+
+  color: var(--button);
+}
+
+.cupomBox {
+  margin-top: 16px;
+
+  padding: 14px;
+
+  border-radius: 16px;
+
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.28);
+}
+
+.cupomBox span {
+  color: #22c55e;
+
+  font-weight: 900;
+}
+
+.cupomBox p {
+  margin: 6px 0 0 0;
+
+  color: var(--text-secondary);
+
+  font-size: 14px;
+}
+
+.tituloItens {
+  margin-bottom: 16px;
+
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.listaItens {
+  display: flex;
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+.itemCard {
+  display: flex;
+  align-items: center;
+
+  gap: 20px;
+
+  padding: 16px;
+
+  border: 1px solid var(--border);
+  border-radius: 18px;
+
+  background: var(--card);
+
+  flex-wrap: wrap;
+}
+
+.itemImagem {
+  width: 110px;
+  height: 110px;
+
+  object-fit: contain;
+
+  border-radius: 14px;
+
+  background: var(--input);
+  border: 1px solid var(--border);
+
+  padding: 6px;
+}
+
+.itemInfo {
+  flex: 1;
+
+  min-width: 220px;
+}
+
+.itemInfo h2 {
+  margin: 0 0 8px 0;
+
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.itemInfo p {
+  margin: 6px 0;
+
+  color: var(--foreground);
+}
+
+.botoesItem {
+  margin-top: 12px;
+
+  display: flex;
+  gap: 10px;
+
+  flex-wrap: wrap;
+}
+
+.botaoAvaliar,
+.botaoProduto {
+  padding: 10px 14px;
+
+  border: none;
+  border-radius: 10px;
+
+  color: white;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.botaoAvaliar {
+  background: #f59e0b;
+}
+
+.botaoProduto {
+  background: #3483fa;
+}
+
+.botaoAvaliar:hover,
+.botaoProduto:hover {
+  transform: translateY(-2px);
+
+  filter: brightness(1.08);
+}
+
+@media (max-width: 650px) {
+  .container {
+    margin: 20px auto;
+    padding: 14px;
+  }
+
+  .cardResumo {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .topoPedido h1 {
+    font-size: 26px;
+  }
+
+  .itemCard {
+    align-items: flex-start;
+  }
+
+  .itemImagem {
+    width: 95px;
+    height: 95px;
+  }
+
+  .botaoAvaliar,
+  .botaoProduto {
+    width: 100%;
+  }
+}

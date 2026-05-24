@@ -4,7 +4,7 @@ import Arquivo from "@/models/Arquivo";
 import sequelize from "@/database";
 import upload from "@/lib/upload";
 import Product from "@/models/Produto";
-
+import { protegerRota } from "@/lib/middleware";
 export const config = {
   api: {
     bodyParser: false,
@@ -35,6 +35,15 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   try {
+    const user: any = protegerRota(req);
+
+    if (!user) {
+      return res.status(401).json({ erro: "Não autenticado" });
+    }
+
+    if (user.acesso !== "admin") {
+      return res.status(403).json({ erro: "Acesso negado" });
+    }
     await middleWare(req, res, upload.single("arquivo"));
 
     const arquivo_enviado = req.file;
@@ -58,10 +67,12 @@ export default async function handler(
         return res.status(200).json({ registro_arquivo, produto });
       }
     }
-
     return res.status(200).json(registro_arquivo);
-  } catch (error: any) {
-    console.log(error);
-    return res.status(500).json({ mensagem: "Deu ruim" });
+  } catch (err) {
+    console.error("ERRO INTERNO:", err);
+
+    return res.status(500).json({
+      erro: "Erro interno no servidor",
+    });
   }
 }

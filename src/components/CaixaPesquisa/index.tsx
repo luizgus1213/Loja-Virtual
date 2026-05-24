@@ -1,300 +1,441 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
-import style from "./style.module.css";
-import Product from "@/models/Produto";
-interface CaixaPesquisaProps {
-  callback: any;
-  setFiltroAberto: any;
-  router?: any;
+import styles from "./style.module.css";
+
+interface Produto {
+  id: number;
+  nome: string;
+  marca: string;
+  categoria: string;
+  descricao: string;
+  preco: number;
+  avaliacao?: number;
+  estoque: number;
+
+  capa?: {
+    id: number;
+    nome: string;
+    link: string;
+  } | null;
 }
 
-const CaixaPesquisa = ({
+interface Props {
+  callback: (produtos: Produto[]) => void;
+  setFiltroAberto?: (aberto: boolean) => void;
+  modo?: "home" | "produto";
+}
+
+const categorias = [
+  "Celulares",
+  "Informática",
+  "Eletrônicos",
+  "Games",
+  "Móveis",
+  "Eletrodomésticos",
+  "Roupas",
+  "Acessórios",
+];
+
+export default function CaixaPesquisa({
   callback,
   setFiltroAberto,
-  router,
-}: CaixaPesquisaProps) => {
+  modo = "home",
+}: Props) {
   const [pesquisa, setPesquisa] = useState("");
-  const [valorMinimo, setvalorMinimo] = useState(0);
-  const [valorMaximo, setvalorMaximo] = useState(99999999999999999999);
-  const [mostrarFiltros, setMostrarFiltros] = useState(false);
-  const [sugestoes, setSugestoes] = useState<string[]>([]);
-  const [mostrarSidebar, setMostrarSidebar] = useState(false);
-  const [sidebarFechada, setSidebarFechada] = useState(false);
-  const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
-  const [marca, setMarca] = useState("");
-  const [categoria, setCategoria] = useState("");
-  const [avaliacaoMin, setAvaliacaoMin] = useState(0);
-  const [ordenar, setOrdenar] = useState("");
-  const [estoque, setEstoque] = useState(false);
-  const buscarSugestoes = async (texto: string) => {
-    if (!texto) {
-      setSugestoes([]);
-      return;
+  const [categoria, setCategoria] = useState("todos");
+  const [valorMinimo, setValorMinimo] = useState("");
+  const [valorMaximo, setValorMaximo] = useState("");
+  const [ordenacao, setOrdenacao] = useState("relevancia");
+  const [apenasDisponiveis, setApenasDisponiveis] = useState(false);
+
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
+  const [carregando, setCarregando] = useState(false);
+
+  async function pesquisar(filtros?: {
+    pesquisa?: string;
+    categoria?: string;
+    valorMinimo?: string;
+    valorMaximo?: string;
+    ordenacao?: string;
+    apenasDisponiveis?: boolean;
+  }) {
+    try {
+      setCarregando(true);
+
+      const pesquisaFinal = filtros?.pesquisa ?? pesquisa;
+      const categoriaFinal = filtros?.categoria ?? categoria;
+      const valorMinimoFinal = filtros?.valorMinimo ?? valorMinimo;
+      const valorMaximoFinal = filtros?.valorMaximo ?? valorMaximo;
+      const ordenacaoFinal = filtros?.ordenacao ?? ordenacao;
+      const apenasDisponiveisFinal =
+        filtros?.apenasDisponiveis ?? apenasDisponiveis;
+
+      const res = await axios.get("/api/pesquisar", {
+        params: {
+          pesquisa: pesquisaFinal.trim(),
+          categoria: categoriaFinal,
+          valorMinimo: valorMinimoFinal || 0,
+          valorMaximo: valorMaximoFinal || 999999999,
+          ordenacao: ordenacaoFinal,
+          apenasDisponiveis: apenasDisponiveisFinal,
+        },
+      });
+
+      callback(res.data || []);
+    } catch (err: any) {
+      console.log("ERRO AO PESQUISAR:", err);
+      alert(err?.response?.data?.erro || "Erro ao pesquisar produtos");
+    } finally {
+      setCarregando(false);
     }
+  }
 
-    const response = await axios.get("/api/buscar", {
-      params: { q: texto },
-    });
+  function abrirFecharFiltros() {
+    const novoValor = !filtrosAbertos;
 
-    const nomes = response.data.map((p: any) => p.nome);
+    setFiltrosAbertos(novoValor);
 
-    const textoLower = texto.toLowerCase();
+    if (setFiltroAberto) {
+      setFiltroAberto(novoValor);
+    }
+  }
 
-    const ordenado = nomes.sort((a: string, b: string) => {
-      const aStarts = a.toLowerCase().startsWith(textoLower);
-      const bStarts = b.toLowerCase().startsWith(textoLower);
-
-      if (aStarts && !bStarts) return -1;
-      if (!aStarts && bStarts) return 1;
-
-      return a.localeCompare(b);
-    });
-
-    setSugestoes(ordenado);
-  };
-
-  const pesquisar = async (min = valorMinimo, max = valorMaximo) => {
-    if (pesquisa === "") return;
-
-    const response = await axios.get("/api/pesquisar", {
-      params: {
-        pesquisa,
-        valorMinimo: min,
-        valorMaximo: max,
-        marca,
-        categoria,
-        avaliacaoMin,
-        ordenar,
-        estoque,
-      },
-    });
-    callback(response.data);
-    setMostrarSugestoes(false);
-  };
-
-  const limparFiltros = async () => {
+  function limparFiltros() {
     setPesquisa("");
-    setvalorMinimo(0);
-    setvalorMaximo(100);
-    setMarca("");
-    setCategoria("");
-    setAvaliacaoMin(0);
-    setOrdenar("");
-    setEstoque(false);
+    setCategoria("todos");
+    setValorMinimo("");
+    setValorMaximo("");
+    setOrdenacao("relevancia");
+    setApenasDisponiveis(false);
 
-    const response = await axios.get("/api/pesquisar");
-    callback(response.data);
-    buscarSugestoes("");
-  };
+    window.location.href = "/";
+  }
 
-  useEffect(() => {
-    if (pesquisa === "") return;
+  function pesquisarComEnter(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      pesquisar();
+    }
+  }
 
-    pesquisar();
-  }, [
-    valorMinimo,
-    valorMaximo,
-    marca,
-    categoria,
-    avaliacaoMin,
-    ordenar,
-    estoque,
-  ]);
+  function aplicarPreco(min: string, max: string) {
+    setValorMinimo(min);
+    setValorMaximo(max);
+
+    pesquisar({
+      valorMinimo: min,
+      valorMaximo: max,
+    });
+  }
+
+  function aplicarOrdenacao(valor: string) {
+    setOrdenacao(valor);
+
+    pesquisar({
+      ordenacao: valor,
+    });
+  }
+
+  function aplicarCategoria(valor: string) {
+    setCategoria(valor);
+
+    pesquisar({
+      categoria: valor,
+    });
+  }
+
+  function alternarEstoque() {
+    const novoValor = !apenasDisponiveis;
+
+    setApenasDisponiveis(novoValor);
+
+    pesquisar({
+      apenasDisponiveis: novoValor,
+    });
+  }
+
   return (
-    <>
-      <div className={style.topo}>
-        <button
-          className={style.botaoReset}
-          onClick={async () => {
-            if (router) {
-              router.back();
-              return;
-            }
-
-            setPesquisa("");
-            setMostrarSugestoes(false);
-
-            const response = await axios.get("/api/pesquisar");
-            callback(response.data);
-          }}
-        >
-          ←
-        </button>
+    <section
+      className={`${styles.caixa} ${
+        modo === "produto" ? styles.caixaProduto : ""
+      }`}
+    >
+      <div className={styles.barraPrincipal}>
         <input
-          className={style.input}
           value={pesquisa}
-          onChange={(e) => {
-            setPesquisa(e.target.value);
-
-            if (e.target.value.length > 0) {
-              setMostrarSugestoes(true);
-            } else {
-              setMostrarSugestoes(false);
-            }
-
-            buscarSugestoes(e.target.value);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              setMostrarSidebar(true);
-              pesquisar();
-            }
-          }}
-          type="text"
-          placeholder="Buscar produtos,marcas e muito mais..."
+          onChange={(e) => setPesquisa(e.target.value)}
+          onKeyDown={pesquisarComEnter}
+          placeholder={
+            modo === "produto"
+              ? "Buscar outro produto na loja..."
+              : "Pesquisar produtos, marcas ou categorias..."
+          }
+          className={styles.inputPesquisa}
         />
-        {mostrarSugestoes && sugestoes.length > 0 && (
-          <div className={style.sugestoes}>
-            {sugestoes.map((s, i) => (
-              <div
-                key={i}
-                className={style.itemSugestao}
-                onClick={() => {
-                  setPesquisa(s);
-                  setSugestoes([]);
-                  setMostrarSugestoes(false);
-                  pesquisar();
-                }}
-              >
-                🔍 {s}
-              </div>
-            ))}
-          </div>
-        )}
-        {pesquisa.length > 0 ? (
-          <button
-            className={style.botaoCancelar}
-            onClick={() => {
-              setPesquisa("");
-              setMostrarSugestoes(false);
-              setMostrarSidebar(false);
-            }}
-          >
-            X
-          </button>
-        ) : (
-          <button className={style.botaoBuscar} onClick={() => pesquisar()}>
-            🔍
-          </button>
-        )}
-      </div>
 
-      <div
-        className={`
-    ${style.sidebar}
-    ${mostrarSidebar ? style.ativo : ""}
-    ${sidebarFechada ? style.sidebarFechada : ""}
-  `}
-      >
         <button
-          className={style.botaoSidebar}
-          onClick={() => setSidebarFechada(!sidebarFechada)}
+          type="button"
+          className={styles.botaoPesquisar}
+          onClick={() => pesquisar()}
+          disabled={carregando}
         >
-          {sidebarFechada ? "→" : "←"}
+          {carregando ? "Buscando..." : "Pesquisar"}
         </button>
 
-        {!sidebarFechada && (
-          <>
-            <h3>Filtros</h3>
+        <button
+          type="button"
+          className={styles.botaoFiltro}
+          onClick={abrirFecharFiltros}
+        >
+          {filtrosAbertos ? "Fechar filtros" : "Filtros"}
+        </button>
+      </div>
+      {modo === "home" && (
+        <div className={styles.filtrosRapidos}>
+          <button type="button" onClick={() => aplicarPreco("0", "100")}>
+            Até R$100
+          </button>
 
-            <p
-              onClick={() => {
-                setvalorMinimo(0);
-                setvalorMaximo(350);
-              }}
-            >
-              Até R$ 350
-            </p>
+          <button type="button" onClick={() => aplicarPreco("0", "300")}>
+            Até R$300
+          </button>
 
-            <p
-              onClick={() => {
-                setvalorMinimo(350);
-                setvalorMaximo(650);
-              }}
-            >
-              R$ 350 a R$ 650
-            </p>
+          <button type="button" onClick={() => aplicarPreco("300", "800")}>
+            R$300 a R$800
+          </button>
 
-            <p
-              onClick={() => {
-                setvalorMinimo(650);
-                setvalorMaximo(99999999999999999999);
-              }}
-            >
-              Mais de R$ 650
-            </p>
+          <button type="button" onClick={() => aplicarPreco("800", "1500")}>
+            R$800 a R$1500
+          </button>
 
-            <div className={style.precoRange}>
-              <input
-                value={valorMinimo === 0 ? "" : valorMinimo}
-                onChange={(e) => setvalorMinimo(Number(e.target.value) || 0)}
-                type="number"
-                placeholder="Mínimo"
-              />
+          <button type="button" onClick={() => aplicarPreco("1500", "3000")}>
+            R$1500 a R$3000
+          </button>
 
-              <span>-</span>
+          <button
+            type="button"
+            onClick={() => aplicarPreco("3000", "999999999")}
+          >
+            Acima de R$3000
+          </button>
 
-              <input
-                value={valorMaximo === 99999999999999999999 ? "" : valorMaximo}
-                onChange={(e) => setvalorMaximo(Number(e.target.value) || 0)}
-                type="number"
-                placeholder="Máximo"
-              />
+          <button
+            type="button"
+            className={apenasDisponiveis ? styles.chipAtivo : ""}
+            onClick={alternarEstoque}
+          >
+            Com estoque
+          </button>
+
+          <button type="button" onClick={() => aplicarOrdenacao("menor_preco")}>
+            Menor preço
+          </button>
+
+          <button type="button" onClick={() => aplicarOrdenacao("maior_preco")}>
+            Maior preço
+          </button>
+
+          <button
+            type="button"
+            onClick={() => aplicarOrdenacao("melhor_avaliacao")}
+          >
+            Mais avaliados
+          </button>
+        </div>
+      )}
+
+      {filtrosAbertos && (
+        <div className={styles.filtrosBox}>
+          <div className={styles.bloco}>
+            <div className={styles.blocoTitulo}>
+              <strong>Categorias</strong>
+              <span>Clique para filtrar automaticamente</span>
             </div>
 
-            <input
-              value={marca}
-              onChange={(e) => setMarca(e.target.value)}
-              type="text"
-              placeholder="Marca"
-            />
+            <div className={styles.chips}>
+              <button
+                type="button"
+                className={categoria === "todos" ? styles.chipAtivo : ""}
+                onClick={() => aplicarCategoria("todos")}
+              >
+                Todos
+              </button>
 
-            <input
-              value={categoria}
-              onChange={(e) => setCategoria(e.target.value)}
-              type="text"
-              placeholder="Categoria"
-            />
+              {categorias.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  className={categoria === cat ? styles.chipAtivo : ""}
+                  onClick={() => aplicarCategoria(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
 
-            <select
-              value={avaliacaoMin}
-              onChange={(e) => setAvaliacaoMin(Number(e.target.value))}
-            >
-              <option value={0}>Qualquer avaliação</option>
-              <option value={1}>1⭐ ou mais</option>
-              <option value={2}>2⭐ ou mais</option>
-              <option value={3}>3⭐ ou mais</option>
-              <option value={4}>4⭐ ou mais</option>
-            </select>
+          <div className={styles.bloco}>
+            <div className={styles.blocoTitulo}>
+              <strong>Faixa de preço</strong>
+              <span>Clique em uma faixa para pesquisar na hora</span>
+            </div>
 
-            <select
-              value={ordenar}
-              onChange={(e) => setOrdenar(e.target.value)}
-            >
-              <option value="">Ordenar</option>
-              <option value="preco_ASC">Preço ↑</option>
-              <option value="preco_DESC">Preço ↓</option>
-              <option value="avaliacao_DESC">Melhor avaliados</option>
-            </select>
+            <div className={styles.chips}>
+              <button type="button" onClick={() => aplicarPreco("0", "100")}>
+                Até R$100
+              </button>
 
-            <label className="label_Estoque">
+              <button type="button" onClick={() => aplicarPreco("0", "300")}>
+                Até R$300
+              </button>
+
+              <button type="button" onClick={() => aplicarPreco("300", "800")}>
+                R$300 a R$800
+              </button>
+
+              <button type="button" onClick={() => aplicarPreco("800", "1500")}>
+                R$800 a R$1500
+              </button>
+
+              <button
+                type="button"
+                onClick={() => aplicarPreco("1500", "3000")}
+              >
+                R$1500 a R$3000
+              </button>
+
+              <button
+                type="button"
+                onClick={() => aplicarPreco("3000", "999999999")}
+              >
+                Acima de R$3000
+              </button>
+            </div>
+
+            <div className={styles.precoManual}>
+              <label>
+                Mínimo
+                <input
+                  type="number"
+                  min="0"
+                  value={valorMinimo}
+                  onChange={(e) => setValorMinimo(e.target.value)}
+                  placeholder="R$ 0"
+                />
+              </label>
+
+              <label>
+                Máximo
+                <input
+                  type="number"
+                  min="0"
+                  value={valorMaximo}
+                  onChange={(e) => setValorMaximo(e.target.value)}
+                  placeholder="R$ 9999"
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className={styles.bloco}>
+            <div className={styles.blocoTitulo}>
+              <strong>Ordenação</strong>
+              <span>Clique para ordenar automaticamente</span>
+            </div>
+
+            <div className={styles.chips}>
+              <button
+                type="button"
+                className={ordenacao === "relevancia" ? styles.chipAtivo : ""}
+                onClick={() => aplicarOrdenacao("relevancia")}
+              >
+                Relevância
+              </button>
+
+              <button
+                type="button"
+                className={ordenacao === "menor_preco" ? styles.chipAtivo : ""}
+                onClick={() => aplicarOrdenacao("menor_preco")}
+              >
+                Menor preço
+              </button>
+
+              <button
+                type="button"
+                className={ordenacao === "maior_preco" ? styles.chipAtivo : ""}
+                onClick={() => aplicarOrdenacao("maior_preco")}
+              >
+                Maior preço
+              </button>
+
+              <button
+                type="button"
+                className={
+                  ordenacao === "melhor_avaliacao" ? styles.chipAtivo : ""
+                }
+                onClick={() => aplicarOrdenacao("melhor_avaliacao")}
+              >
+                Melhor avaliação
+              </button>
+
+              <button
+                type="button"
+                className={
+                  ordenacao === "mais_recentes" ? styles.chipAtivo : ""
+                }
+                onClick={() => aplicarOrdenacao("mais_recentes")}
+              >
+                Mais recentes
+              </button>
+
+              <button
+                type="button"
+                className={
+                  ordenacao === "maior_estoque" ? styles.chipAtivo : ""
+                }
+                onClick={() => aplicarOrdenacao("maior_estoque")}
+              >
+                Maior estoque
+              </button>
+            </div>
+          </div>
+
+          <div className={styles.bloco}>
+            <div className={styles.blocoTitulo}>
+              <strong>Disponibilidade</strong>
+              <span>Filtra produtos disponíveis</span>
+            </div>
+
+            <label className={styles.checkBox}>
               <input
-                className="Estoque"
                 type="checkbox"
-                checked={estoque}
-                onChange={(e) => setEstoque(e.target.checked)}
+                checked={apenasDisponiveis}
+                onChange={alternarEstoque}
               />
-              Somente em estoque
-            </label>
 
-            <button className={style.botaoLimpar} onClick={limparFiltros}>
+              <span>Mostrar somente produtos com estoque</span>
+            </label>
+          </div>
+
+          <div className={styles.acoesFiltro}>
+            <button
+              type="button"
+              className={styles.botaoAplicar}
+              onClick={() => pesquisar()}
+              disabled={carregando}
+            >
+              {carregando ? "Aplicando..." : "Aplicar filtros manuais"}
+            </button>
+
+            <button
+              type="button"
+              className={styles.botaoLimpar}
+              onClick={limparFiltros}
+            >
               Limpar filtros
             </button>
-          </>
-        )}
-      </div>
-    </>
+          </div>
+        </div>
+      )}
+    </section>
   );
-};
-
-export default CaixaPesquisa;
+}

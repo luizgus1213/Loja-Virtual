@@ -30,7 +30,6 @@ export default async function handler(
 
     console.log("ENVIANDO EMAIL PARA:", email);
 
-    // TESTA EMAIL PRIMEIRO
     await enviarCodigoEmail(email, codigo);
 
     console.log("EMAIL ENVIADO");
@@ -54,11 +53,10 @@ export default async function handler(
       user,
     });
   } catch (err) {
-    console.log("ERRO REGISTER:");
-    console.log(err);
+    console.error("ERRO INTERNO:", err);
 
     return res.status(500).json({
-      erro: "Erro ao cadastrar",
+      erro: "Erro interno no servidor",
     });
   }
 }
