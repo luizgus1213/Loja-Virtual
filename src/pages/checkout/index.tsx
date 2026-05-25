@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import styles from "./style.module.css";
-
+interface ValidarCupomResponse {
+  cupom: CupomAplicado;
+}
 interface ItemCarrinho {
   id: number;
   quantidade: number;
@@ -173,16 +175,19 @@ export default function CheckoutPage() {
 
       setValidandoCupom(true);
 
-      const res = await axios.post(
+      const res = await axios.post<ValidarCupomResponse>(
         "/api/cupons/validar",
         {
-          codigo,
+          codigo: cupomCodigo,
           totalProdutos,
         },
         {
           withCredentials: true,
         },
       );
+
+      setCupomAplicado(res.data.cupom);
+      setCupomCodigo(res.data.cupom.codigo);
 
       setCupomAplicado(res.data.cupom);
       setCupomCodigo(res.data.cupom.codigo);
