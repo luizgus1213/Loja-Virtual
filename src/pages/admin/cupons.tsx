@@ -133,7 +133,9 @@ export default function AdminCupons() {
 
       if (!ok) return;
 
-      await axios.delete("/api/admin/cupons/excluir", {
+      await axios.request({
+        method: "DELETE",
+        url: "/api/admin/cupons/excluir",
         data: {
           cupomId,
         },
