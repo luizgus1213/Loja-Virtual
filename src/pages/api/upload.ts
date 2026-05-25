@@ -1,78 +1,93 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiResponse } from "next";
+
+import "@/models";
+
 import Arquivo from "@/models/Arquivo";
-import sequelize from "@/database";
-import upload from "@/lib/upload";
-import Product from "@/models/Produto";
-import { protegerRota } from "@/lib/middleware";
+import Produto from "@/models/Produto";
+import ProdutoImagem from "@/models/ProdutoImagem";
+
+import {
+  uploadArquivo,
+  obterLinkArquivo,
+  NextApiComArquivo,
+} from "@/lib/upload";
+
 export const config = {
   api: {
     bodyParser: false,
   },
 };
 
-const middleWare = (
-  req: NextApiRequest,
-  res: NextApiResponse,
-  next: Function,
-) => {
-  return new Promise((resolve, reject) => {
-    next(req, res, (result: any) => {
-      if (result instanceof Error) {
-        return reject(result);
-      }
-      return resolve(result);
-    });
-  });
-};
-
-interface NextApiComArquivo extends NextApiRequest {
-  file: any;
-}
-
 export default async function handler(
   req: NextApiComArquivo,
   res: NextApiResponse,
 ) {
+  if (req.method !== "POST") {
+    return res.status(405).json({
+      erro: "Método não permitido",
+    });
+  }
+
   try {
-    const user: any = protegerRota(req);
-
-    if (!user) {
-      return res.status(401).json({ erro: "Não autenticado" });
-    }
-
-    if (user.acesso !== "admin") {
-      return res.status(403).json({ erro: "Acesso negado" });
-    }
-    await middleWare(req, res, upload.single("arquivo"));
+    await uploadArquivo(req, res);
 
     const arquivo_enviado = req.file;
-
     const produto_id = req.body.produto_id;
 
-    const registro_arquivo = await Arquivo.create({
+    if (!arquivo_enviado) {
+      return res.status(400).json({
+        erro: "Nenhum arquivo enviado",
+      });
+    }
+
+    if (!produto_id) {
+      return res.status(400).json({
+        erro: "Produto não informado",
+      });
+    }
+
+    const produto: any = await Produto.findByPk(produto_id);
+
+    if (!produto) {
+      return res.status(404).json({
+        erro: "Produto não encontrado",
+      });
+    }
+
+    const registro_arquivo: any = await Arquivo.create({
       nome: arquivo_enviado.originalname,
-      link: "uploads/" + arquivo_enviado.filename,
+      link: obterLinkArquivo(arquivo_enviado.filename),
       provider: "local",
     });
 
-    if (produto_id) {
-      const produto = await Product.findByPk(produto_id);
+    const quantidadeImagens = await ProdutoImagem.count({
+      where: {
+        produto_id,
+      },
+    });
 
-      if (produto) {
-        produto.update({
-          imagem_id: registro_arquivo.toJSON().id,
-        });
+    await ProdutoImagem.create({
+      produto_id,
+      arquivo_id: registro_arquivo.id,
+      principal: quantidadeImagens === 0,
+      ordem: quantidadeImagens,
+    });
 
-        return res.status(200).json({ registro_arquivo, produto });
-      }
+    if (quantidadeImagens === 0) {
+      await produto.update({
+        imagem_id: registro_arquivo.id,
+      });
     }
-    return res.status(200).json(registro_arquivo);
-  } catch (err) {
-    console.error("ERRO INTERNO:", err);
+
+    return res.status(200).json({
+      sucesso: true,
+      arquivo: registro_arquivo,
+    });
+  } catch (error: any) {
+    console.log("ERRO UPLOAD IMAGEM:", error);
 
     return res.status(500).json({
-      erro: "Erro interno no servidor",
+      erro: error?.message || "Erro ao enviar imagem",
     });
   }
 }
