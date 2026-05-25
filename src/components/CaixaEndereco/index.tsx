@@ -3,6 +3,15 @@ import { useState } from "react";
 import axios from "axios";
 import Alerta from "@/components/Alarmebonito";
 import { useAlerta } from "@/contexts/AlertaContext";
+interface ViaCepResponse {
+  cep: string;
+  logradouro: string;
+  complemento: string;
+  bairro: string;
+  localidade: string;
+  uf: string;
+  erro?: boolean;
+}
 interface EnderecoType {
   id?: number;
 
@@ -62,8 +71,9 @@ const CaixaEndereco = ({
 
       if (cepLimpo.length !== 8) return;
 
-      const res = await axios.get(`https://viacep.com.br/ws/${cepLimpo}/json/`);
-
+      const res = await axios.get<ViaCepResponse>(
+        `https://viacep.com.br/ws/${cepLimpo}/json/`,
+      );
       if (res.data.erro) {
         exibirAlerta("CEP não encontrado", "erro");
 
