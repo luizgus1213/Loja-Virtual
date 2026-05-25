@@ -2,9 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import styles from "./style.module.css";
-interface ValidarCupomResponse {
-  cupom: CupomAplicado;
-}
+
 interface ItemCarrinho {
   id: number;
   quantidade: number;
@@ -46,6 +44,18 @@ interface CupomAplicado {
   tipo: string;
   valor: number;
   desconto: number;
+}
+
+interface ValidarCupomResponse {
+  cupom: CupomAplicado;
+}
+
+interface FinalizarPedidoResponse {
+  pedidoId: number;
+}
+
+interface CarrinhoResponse {
+  itens: ItemCarrinho[];
 }
 
 function moeda(valor: number) {
@@ -104,12 +114,9 @@ export default function CheckoutPage() {
       setLoading(true);
 
       const [resCarrinho, resEnderecos] = await Promise.all([
-        axios.get<ItemCarrinho[] | { itens: ItemCarrinho[] }>(
-          "/api/carrinho/listar",
-          {
-            withCredentials: true,
-          },
-        ),
+        axios.get<ItemCarrinho[] | CarrinhoResponse>("/api/carrinho/listar", {
+          withCredentials: true,
+        }),
 
         axios.get<Endereco[]>("/api/enderecos/listar", {
           withCredentials: true,
@@ -121,6 +128,7 @@ export default function CheckoutPage() {
         : resCarrinho.data.itens || [];
 
       const listaEnderecos: Endereco[] = resEnderecos.data || [];
+
       setItens(listaItens);
       setEnderecos(listaEnderecos);
 
@@ -178,16 +186,13 @@ export default function CheckoutPage() {
       const res = await axios.post<ValidarCupomResponse>(
         "/api/cupons/validar",
         {
-          codigo: cupomCodigo,
+          codigo,
           totalProdutos,
         },
         {
           withCredentials: true,
         },
       );
-
-      setCupomAplicado(res.data.cupom);
-      setCupomCodigo(res.data.cupom.codigo);
 
       setCupomAplicado(res.data.cupom);
       setCupomCodigo(res.data.cupom.codigo);
@@ -200,6 +205,7 @@ export default function CheckoutPage() {
       setValidandoCupom(false);
     }
   }
+
   async function finalizarPedido() {
     try {
       if (itensSelecionadosIds.length === 0) {
@@ -214,7 +220,7 @@ export default function CheckoutPage() {
 
       setFinalizando(true);
 
-      const res = await axios.post(
+      const res = await axios.post<FinalizarPedidoResponse>(
         "/api/checkout/finalizar",
         {
           itensIds: itensSelecionadosIds,
@@ -268,6 +274,7 @@ export default function CheckoutPage() {
 
     carregarDados();
   }, [router.isReady]);
+
   if (loading) {
     return (
       <main className={styles.page}>

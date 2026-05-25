@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { ArrowLeft } from "lucide-react";
 import styles from "./style.module.css";
 import { useAlerta } from "@/contexts/AlertaContext";
+
 interface Favorito {
   id: number;
 
@@ -23,7 +24,6 @@ export default function Favoritos() {
 
   const [favoritos, setFavoritos] = useState<Favorito[]>([]);
   const [loading, setLoading] = useState(true);
-  const [mostrarAlerta, setMostrarAlerta] = useState(false);
 
   const { exibirAlerta } = useAlerta();
 
@@ -45,15 +45,18 @@ export default function Favoritos() {
 
   async function removerFavorito(produtoId: number) {
     try {
-      await axios.delete("/api/favoritos/remover", {
+      await axios.request({
+        method: "DELETE",
+        url: "/api/favoritos/remover",
         data: {
           produtoId,
         },
+        withCredentials: true,
       });
+
       setFavoritos((prev) => prev.filter((f) => f.produto.id !== produtoId));
 
       exibirAlerta("Favorito removido!", "sucesso");
-      setFavoritos((prev) => prev.filter((f) => f.produto.id !== produtoId));
     } catch (err) {
       console.log(err);
 
