@@ -37,7 +37,7 @@ export default function InformacoesPage() {
     try {
       setLoading(true);
 
-      const res = await axios.get("/api/auth/me", {
+      const res = await axios.get<User>("/api/auth/me", {
         withCredentials: true,
       });
 

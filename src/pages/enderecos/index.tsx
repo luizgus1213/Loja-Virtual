@@ -41,7 +41,7 @@ export default function EnderecosPage() {
     try {
       setLoading(true);
 
-      const res = await axios.get("/api/enderecos/listar", {
+      const res = await axios.get<Endereco[]>("/api/enderecos/listar", {
         withCredentials: true,
       });
 
@@ -180,7 +180,9 @@ export default function EnderecosPage() {
 
       if (!confirmar) return;
 
-      await axios.delete("/api/endereco/excluir", {
+      await axios.request({
+        method: "DELETE",
+        url: "/api/endereco/excluir",
         data: {
           id,
         },

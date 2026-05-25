@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./email.module.css";
 import { useAlerta } from "@/contexts/AlertaContext";
+interface AuthMeResponse {
+  email: string;
+  email_pendente?: string | null;
+}
 export default function VerificarEmail() {
   const [codigo, setCodigo] = useState("");
   const [email, setEmail] = useState("");
@@ -12,7 +16,7 @@ export default function VerificarEmail() {
 
   async function carregarUsuario() {
     try {
-      const res = await axios.get("/api/auth/me", {
+      const res = await axios.get<AuthMeResponse>("/api/auth/me", {
         withCredentials: true,
       });
 

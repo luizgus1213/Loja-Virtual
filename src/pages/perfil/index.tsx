@@ -2,7 +2,15 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import styles from "./perfil.module.css";
-
+interface User {
+  id: number;
+  nome: string;
+  email: string;
+  acesso?: string;
+  foto_perfil?: {
+    link: string;
+  } | null;
+}
 interface User {
   id: number;
   nome: string;
@@ -23,7 +31,7 @@ export default function PerfilCentral() {
     try {
       setLoading(true);
 
-      const res = await axios.get("/api/auth/me", {
+      const res = await axios.get<User>("/api/auth/me", {
         withCredentials: true,
       });
 

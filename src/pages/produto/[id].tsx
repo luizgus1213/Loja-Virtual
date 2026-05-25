@@ -4,7 +4,6 @@ import styles from "./style.module.css";
 import CaixaPesquisa from "@/components/CaixaPesquisa";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import homeStyles from "@/styles/Home.module.css";
 import { useAlerta } from "@/contexts/AlertaContext";
 
 interface Produto {
@@ -22,6 +21,11 @@ interface Produto {
     link: string;
   } | null;
 
+  capa?: {
+    id?: number;
+    link: string;
+  } | null;
+
   imagens?: {
     id: number;
     principal: boolean;
@@ -33,6 +37,32 @@ interface Produto {
   }[];
 }
 
+interface Avaliacao {
+  id: number;
+  nota: number;
+  comentario?: string | null;
+
+  user?: {
+    id: number;
+    nome: string;
+  } | null;
+}
+
+interface AvaliacaoStatusResponse {
+  podeAvaliar: boolean;
+
+  avaliacao?: {
+    nota: number;
+    comentario?: string | null;
+  } | null;
+}
+
+interface CarrinhoAdicionarResponse {
+  itemId?: number;
+  sucesso?: boolean;
+  mensagem?: string;
+}
+
 interface Props {
   produto: Produto | null;
   relacionados: Produto[];
@@ -42,7 +72,7 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
   const [podeAvaliar, setPodeAvaliar] = useState(false);
   const [notaAvaliacao, setNotaAvaliacao] = useState(5);
   const [comentarioAvaliacao, setComentarioAvaliacao] = useState("");
-  const [avaliacoes, setAvaliacoes] = useState<any[]>([]);
+  const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
   const [produtosPesquisa, setProdutosPesquisa] = useState<any[]>([]);
   const [tamanho, setTamanho] = useState("");
   const [quantidade, setQuantidade] = useState(1);
@@ -62,7 +92,21 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
   const imagemPrincipal =
     imagensProduto[imagemAtual]?.arquivo?.link ||
     produto?.imagem?.link ||
+    produto?.capa?.link ||
     "sem-imagem.png";
+
+  const isRoupa = useMemo(() => {
+    return (
+      produto?.categoria?.toLowerCase().includes("roupa") ||
+      produto?.descricao?.toLowerCase().includes("roupa")
+    );
+  }, [produto]);
+
+  const precoTotal = useMemo(() => {
+    if (!produto) return 0;
+
+    return produto.preco * quantidade;
+  }, [produto, quantidade]);
 
   function voltarImagem() {
     if (imagensProduto.length === 0) return;
@@ -105,27 +149,25 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
     try {
       if (!produto) return;
 
-      const res = await axios.post(
-        "/api/checkout/comprar_direto",
+      const res = await axios.post<AvaliacaoStatusResponse>(
+        "/api/avaliacoes/status",
         {
           produtoId: produto.id,
-          quantidade,
-          cor: corSelecionada,
-          tamanho: isRoupa ? tamanho : null,
         },
         {
           withCredentials: true,
         },
       );
 
-      setPodeAvaliar(res.data.podeAvaliar);
+      setPodeAvaliar(Boolean(res.data.podeAvaliar));
 
       if (res.data.avaliacao) {
         setNotaAvaliacao(res.data.avaliacao.nota);
         setComentarioAvaliacao(res.data.avaliacao.comentario || "");
       }
     } catch (err) {
-      console.log(err);
+      console.log("ERRO STATUS AVALIAÇÃO:", err);
+      setPodeAvaliar(false);
     }
   }
 
@@ -133,13 +175,13 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
     try {
       if (!produto) return;
 
-      const res = await axios.get("/api/avaliacoes/listar", {
+      const res = await axios.get<Avaliacao[]>("/api/avaliacoes/listar", {
         params: {
           produtoId: produto.id,
         },
       });
 
-      setAvaliacoes(res.data);
+      setAvaliacoes(res.data || []);
     } catch (err) {
       console.log(err);
     }
@@ -175,20 +217,12 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
     }
   }
 
-  const isRoupa = useMemo(() => {
-    return (
-      produto?.categoria?.toLowerCase().includes("roupa") ||
-      produto?.descricao?.toLowerCase().includes("roupa")
-    );
-  }, [produto]);
-
-  const precoTotal = useMemo(() => {
-    if (!produto) return 0;
-
-    return produto.preco * quantidade;
-  }, [produto, quantidade]);
-
   const validarCompra = () => {
+    if (!produto) {
+      exibirAlerta("Produto não encontrado", "erro");
+      return false;
+    }
+
     if (!corSelecionada) {
       exibirAlerta("Selecione uma cor", "erro");
       return false;
@@ -199,7 +233,7 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
       return false;
     }
 
-    if (produto && quantidade > produto.estoque) {
+    if (quantidade > produto.estoque) {
       exibirAlerta("Quantidade maior que o estoque", "erro");
       return false;
     }
@@ -211,7 +245,8 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
 
     return true;
   };
-  const comprar = async (produto: Produto) => {
+
+  const comprar = async (produtoAtual: Produto) => {
     try {
       setLoadingCompra(true);
 
@@ -219,10 +254,10 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
 
       if (!valido) return;
 
-      const resCarrinho = await axios.post(
+      const resCarrinho = await axios.post<CarrinhoAdicionarResponse>(
         "/api/carrinho/adicionar",
         {
-          produtoId: produto.id,
+          produtoId: produtoAtual.id,
           quantidade,
           cor: corSelecionada,
           tamanho: isRoupa ? tamanho : null,
@@ -241,25 +276,30 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
 
       router.push("/checkout");
     } catch (err: any) {
-      console.log(err.response?.data);
+      console.log(err?.response?.data);
 
-      exibirAlerta(err.response?.data?.erro || "Erro ao comprar", "erro");
+      exibirAlerta(err?.response?.data?.erro || "Erro ao comprar", "erro");
+
+      if (err?.response?.status === 401) {
+        router.push("/auth?modo=cadastro");
+      }
     } finally {
       setLoadingCompra(false);
     }
   };
+
   const adicionarCarrinho = async () => {
     try {
       setLoadingCarrinho(true);
 
       const valido = validarCompra();
 
-      if (!valido) return;
+      if (!valido || !produto) return;
 
       await axios.post(
         "/api/carrinho/adicionar",
         {
-          produtoId: produto?.id,
+          produtoId: produto.id,
           quantidade,
           cor: corSelecionada,
           tamanho: isRoupa ? tamanho : null,
@@ -274,31 +314,35 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
       console.error(err);
 
       exibirAlerta(
-        err.response?.data?.erro || "Erro ao adicionar ao carrinho",
+        err?.response?.data?.erro || "Erro ao adicionar ao carrinho",
         "erro",
       );
+
+      if (err?.response?.status === 401) {
+        router.push("/auth?modo=cadastro");
+      }
     } finally {
       setLoadingCarrinho(false);
     }
   };
 
   useEffect(() => {
-    async function carregar() {
+    async function carregarRecomendados() {
       try {
         if (!produto) return;
 
-        const res = await axios.get(
+        const res = await axios.get<Produto[]>(
           `/api/produto/recomendados?categoria=${produto.categoria}&produtoId=${produto.id}`,
         );
 
-        setRecomendados(res.data);
+        setRecomendados(res.data || []);
       } catch (err) {
         console.log(err);
       }
     }
 
     if (produto) {
-      carregar();
+      carregarRecomendados();
       carregarAvaliacaoStatus();
       carregarAvaliacoes();
     }
@@ -331,12 +375,15 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
       console.log("Erro ao salvar produto visto:", err);
     }
   }, [produto]);
+
   if (!produto) {
     return (
       <div className={styles.erro}>
         <h2>Produto não encontrado 😢</h2>
 
-        <button onClick={() => router.push("/")}>Voltar</button>
+        <button type="button" onClick={() => router.push("/")}>
+          Voltar
+        </button>
       </div>
     );
   }
@@ -361,7 +408,7 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
             </div>
 
             <div className={styles.gridPesquisa}>
-              {produtosPesquisa.map((item: any) => (
+              {produtosPesquisa.map((item) => (
                 <div
                   key={item.id}
                   className={styles.cardPesquisa}
@@ -514,7 +561,11 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
                     <button
                       type="button"
                       disabled={quantidade >= produto.estoque}
-                      onClick={() => setQuantidade((q) => q + 1)}
+                      onClick={() =>
+                        setQuantidade((q) =>
+                          q < produto.estoque ? q + 1 : produto.estoque,
+                        )
+                      }
                     >
                       +
                     </button>
@@ -668,7 +719,7 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
               <h3>Quem comprou isso também viu</h3>
 
               <div className={styles.gridRelacionados}>
-                {recomendados.map((item: any) => {
+                {recomendados.map((item) => {
                   const imagem =
                     item.imagem?.link ||
                     item.capa?.link ||
@@ -721,7 +772,7 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
               <h3>Mais opções para você</h3>
 
               <div className={styles.gridRelacionados}>
-                {relacionados.map((item: any) => {
+                {relacionados.map((item) => {
                   const imagem =
                     item.imagem?.link ||
                     item.capa?.link ||
@@ -785,22 +836,31 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { id } = ctx.params!;
+export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
+  const idParam = ctx.params?.id;
+
+  if (!idParam || Array.isArray(idParam)) {
+    return {
+      props: {
+        produto: null,
+        relacionados: [],
+      },
+    };
+  }
 
   try {
-    const produtoRes = await axios.get(
-      process.env.SERVER_URL + `/api/produto/${id}`,
+    const produtoRes = await axios.get<Produto>(
+      `${process.env.SERVER_URL}/api/produto/${idParam}`,
     );
 
     const produto = produtoRes.data;
 
-    const outrosRes = await axios.get(
-      process.env.SERVER_URL + "/api/pesquisar",
+    const outrosRes = await axios.get<Produto[]>(
+      `${process.env.SERVER_URL}/api/pesquisar`,
     );
 
     const relacionados = (outrosRes.data || [])
-      .filter((p: any) => p.id !== Number(id))
+      .filter((p) => p.id !== Number(idParam))
       .slice(0, 4);
 
     return {

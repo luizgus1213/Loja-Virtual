@@ -215,11 +215,12 @@ export default function PedidoPage() {
 
   async function carregarEnderecos() {
     try {
-      const res = await axios.get("/api/enderecos/listar", {
+      const res = await axios.get<Endereco[]>("/api/enderecos/listar", {
         withCredentials: true,
       });
 
       const lista: Endereco[] = res.data || [];
+
       setEnderecos(lista);
 
       if (lista.length > 0) {

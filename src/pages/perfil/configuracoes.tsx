@@ -39,7 +39,7 @@ export default function ConfiguracoesPage() {
     try {
       setLoading(true);
 
-      const res = await axios.get("/api/user/configuracoes", {
+      const res = await axios.get<Configuracoes>("/api/user/configuracoes", {
         withCredentials: true,
       });
 
@@ -130,7 +130,9 @@ export default function ConfiguracoesPage() {
 
       setDesativando(true);
 
-      await axios.delete("/api/user/desativar-conta", {
+      await axios.request({
+        method: "DELETE",
+        url: "/api/user/desativar-conta",
         data: {
           senha: senhaExcluir,
           confirmacao: confirmacaoExcluir,
