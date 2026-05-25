@@ -39,7 +39,7 @@ export default function HeaderLoja() {
 
   async function carregarEndereco() {
     try {
-      const res = await axios.get("/api/enderecos/listar", {
+      const res = await axios.get<Endereco[]>("/api/enderecos/listar", {
         withCredentials: true,
       });
 

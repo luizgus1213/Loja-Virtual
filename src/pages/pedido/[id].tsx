@@ -2,7 +2,19 @@ import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import styles from "./style.module.css";
+interface PedidoResponse {
+  pedido: Pedido;
+  itens: Item[];
+}
 
+interface DefinirEnderecoResponse {
+  pedido: Pedido;
+}
+
+interface PixResponse {
+  codigoPix?: string;
+  copiaecola?: string;
+}
 interface Item {
   id: number;
   quantidade: number;
@@ -175,7 +187,7 @@ export default function PedidoPage() {
 
       setLoading(true);
 
-      const res = await axios.get(`/api/pedido/${id}`, {
+      const res = await axios.get<PedidoResponse>(`/api/pedido/${id}`, {
         withCredentials: true,
       });
 
@@ -208,7 +220,6 @@ export default function PedidoPage() {
       });
 
       const lista: Endereco[] = res.data || [];
-
       setEnderecos(lista);
 
       if (lista.length > 0) {
@@ -230,7 +241,7 @@ export default function PedidoPage() {
 
       setSalvandoEndereco(true);
 
-      const res = await axios.post(
+      const res = await axios.post<DefinirEnderecoResponse>(
         "/api/pedido/definir-endereco",
         {
           pedidoId: pedido.id,
@@ -276,7 +287,7 @@ export default function PedidoPage() {
         }
       }
 
-      const res = await axios.post(
+      const res = await axios.post<PixResponse>(
         "/api/pix/criar",
         {
           pedidoId: pedido.id,

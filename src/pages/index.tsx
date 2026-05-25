@@ -130,7 +130,7 @@ export default function Home({ aleatorios, maisAvaliados, user }: HomeProps) {
         return;
       }
 
-      const res = await axios.get("/api/pesquisar", {
+      const res = await axios.get<Produto[]>("/api/pesquisar", {
         params: {
           pesquisa: "",
           categoria,
@@ -490,8 +490,13 @@ export default function Home({ aleatorios, maisAvaliados, user }: HomeProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const response = await axios.get(process.env.SERVER_URL + "/api/hello");
-
+  interface HelloResponse {
+    aleatorios: Produto[];
+    maisAvaliados: Produto[];
+  }
+  const response = await axios.get<HelloResponse>(
+    `${process.env.SERVER_URL}/api/hello`,
+  );
   const token = req.cookies.token || null;
   let user = null;
 

@@ -40,7 +40,7 @@ export default function MeusCupons() {
     try {
       setLoading(true);
 
-      const res = await axios.get("/api/cupons/disponiveis", {
+      const res = await axios.get<Cupom[]>("/api/cupons/disponiveis", {
         withCredentials: true,
       });
 

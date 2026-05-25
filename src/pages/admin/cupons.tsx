@@ -44,7 +44,7 @@ export default function AdminCupons() {
       setLoading(true);
       setAutorizado(false);
 
-      const res = await axios.get("/api/admin/cupons/listar", {
+      const res = await axios.get<Cupom[]>("/api/admin/cupons/listar", {
         withCredentials: true,
       });
 
