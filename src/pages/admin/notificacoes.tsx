@@ -2,7 +2,9 @@ import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import styles from "./notificacoes.module.css";
-
+interface PromocaoResponse {
+  criadas: number;
+}
 export default function AdminNotificacoes() {
   const router = useRouter();
 
@@ -37,7 +39,7 @@ export default function AdminNotificacoes() {
       setEnviando(true);
       setResultado(null);
 
-      const res = await axios.post(
+      const res = await axios.post<PromocaoResponse>(
         "/api/admin/notificacoes/promocao",
         {
           titulo: titulo.trim(),

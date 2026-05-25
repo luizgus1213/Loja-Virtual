@@ -4,7 +4,9 @@ import styles from "./styles.module.css";
 import { useRouter } from "next/router";
 import { ArrowLeft } from "lucide-react";
 import { useAlerta } from "@/contexts/AlertaContext";
-
+interface ComprarNovamenteResponse {
+  pedidoId: number;
+}
 interface Pedido {
   id: number;
   total: number;
@@ -39,11 +41,11 @@ export default function Historico() {
 
   const carregarHistorico = async () => {
     try {
-      const res = await axios.get("/api/historico/listar", {
+      const res = await axios.get<Pedido[]>("/api/historico/listar", {
         withCredentials: true,
       });
 
-      setPedidos(res.data);
+      setPedidos(res.data || []);
     } catch (err) {
       console.log(err);
       exibirAlerta("Erro ao carregar histórico", "erro");
@@ -103,7 +105,7 @@ export default function Historico() {
 
   async function comprarNovamente(pedidoId: number) {
     try {
-      const res = await axios.post(
+      const res = await axios.post<ComprarNovamenteResponse>(
         "/api/pedido/comprar-novamente",
         {
           pedidoId,

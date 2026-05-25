@@ -37,9 +37,12 @@ export default function AdminDashboard() {
       setLoading(true);
       setAutorizado(false);
 
-      const res = await axios.get("/api/admin/PaginaCentralAdmin", {
-        withCredentials: true,
-      });
+      const res = await axios.get<PaginaCentral>(
+        "/api/admin/PaginaCentralAdmin",
+        {
+          withCredentials: true,
+        },
+      );
 
       setDados(res.data);
       setAutorizado(true);

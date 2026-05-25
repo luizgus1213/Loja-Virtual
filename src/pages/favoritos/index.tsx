@@ -29,11 +29,11 @@ export default function Favoritos() {
 
   async function carregar() {
     try {
-      const res = await axios.get("/api/favoritos/listar", {
+      const res = await axios.get<Favorito[]>("/api/favoritos/listar", {
         withCredentials: true,
       });
 
-      setFavoritos(res.data);
+      setFavoritos(res.data || []);
     } catch (err) {
       console.log(err);
 

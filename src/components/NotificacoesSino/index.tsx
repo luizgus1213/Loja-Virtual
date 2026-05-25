@@ -13,6 +13,11 @@ interface Notificacao {
   createdAt: string;
 }
 
+interface NotificacoesResponse {
+  notificacoes: Notificacao[];
+  naoLidas: number;
+}
+
 export default function NotificacoesSino() {
   const router = useRouter();
 
@@ -22,12 +27,15 @@ export default function NotificacoesSino() {
 
   async function carregar() {
     try {
-      const res = await axios.get("/api/notificacoes/listar", {
-        withCredentials: true,
-      });
+      const res = await axios.get<NotificacoesResponse>(
+        "/api/notificacoes/listar",
+        {
+          withCredentials: true,
+        },
+      );
 
       setNotificacoes(res.data.notificacoes || []);
-      setNaoLidas(res.data.naoLidas || 0);
+      setNaoLidas(Number(res.data.naoLidas || 0));
     } catch {
       setNotificacoes([]);
       setNaoLidas(0);

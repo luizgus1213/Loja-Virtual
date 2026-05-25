@@ -20,7 +20,9 @@ interface PedidoItemAdmin {
     } | null;
   };
 }
-
+interface AlterarStatusResponse {
+  pedido?: Partial<Pedido>;
+}
 interface Pedido {
   id: number;
   total: number;
@@ -100,7 +102,7 @@ export default function AdminPedidos() {
     try {
       setLoading(true);
 
-      const res = await axios.get("/api/admin/pedidos/listar", {
+      const res = await axios.get<Pedido[]>("/api/admin/pedidos/listar", {
         withCredentials: true,
       });
 
@@ -126,7 +128,7 @@ export default function AdminPedidos() {
 
       setAlterandoId(pedidoId);
 
-      const res = await axios.put(
+      const res = await axios.put<AlterarStatusResponse>(
         "/api/admin/pedidos/alterar-status",
         {
           pedidoId,
