@@ -102,18 +102,23 @@ export default function CheckoutPage() {
       setLoading(true);
 
       const [resCarrinho, resEnderecos] = await Promise.all([
-        axios.get("/api/carrinho/listar", {
-          withCredentials: true,
-        }),
+        axios.get<ItemCarrinho[] | { itens: ItemCarrinho[] }>(
+          "/api/carrinho/listar",
+          {
+            withCredentials: true,
+          },
+        ),
 
-        axios.get("/api/enderecos/listar", {
+        axios.get<Endereco[]>("/api/enderecos/listar", {
           withCredentials: true,
         }),
       ]);
 
-      const listaItens: ItemCarrinho[] = resCarrinho.data || [];
-      const listaEnderecos: Endereco[] = resEnderecos.data || [];
+      const listaItens: ItemCarrinho[] = Array.isArray(resCarrinho.data)
+        ? resCarrinho.data
+        : resCarrinho.data.itens || [];
 
+      const listaEnderecos: Endereco[] = resEnderecos.data || [];
       setItens(listaItens);
       setEnderecos(listaEnderecos);
 
