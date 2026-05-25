@@ -23,7 +23,12 @@ interface Produto {
     };
   }[];
 }
-
+interface AuthMeResponse {
+  id: number;
+  nome: string;
+  email: string;
+  acesso: "admin" | "user";
+}
 const produtoInicial = {
   nome: "",
   marca: "",
@@ -55,7 +60,7 @@ export default function AdicionarItens() {
 
   async function verificarAdmin() {
     try {
-      const res = await axios.get("/api/auth/me", {
+      const res = await axios.get<AuthMeResponse>("/api/auth/me", {
         withCredentials: true,
       });
 
@@ -76,7 +81,7 @@ export default function AdicionarItens() {
     try {
       setSalvando(true);
 
-      const response = await axios.get("/api/admin/listar", {
+      const response = await axios.get<Produto[]>("/api/admin/listar", {
         params: {
           limit,
           pesquisa: buscaAdmin,
@@ -84,7 +89,7 @@ export default function AdicionarItens() {
         withCredentials: true,
       });
 
-      setProdutos(response.data);
+      setProdutos(response.data || []);
     } catch (err) {
       console.error(err);
       exibirAlerta("Erro ao carregar produtos", "erro");
@@ -500,15 +505,15 @@ export default function AdicionarItens() {
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const token = req.cookies.token || null;
-  let user = null;
+
+  let user: AuthMeResponse | null = null;
 
   if (token) {
-    user = verificarToken(token);
+    user = verificarToken(token) as AuthMeResponse | null;
   }
 
-  if (!user || user?.acesso !== "admin") {
+  if (!user || user.acesso !== "admin") {
     return {
-      props: {},
       redirect: {
         destination: "/erroAcessoAdmin",
         permanent: false,
