@@ -69,8 +69,7 @@ export default function CaixaPesquisa({
       const ordenacaoFinal = filtros?.ordenacao ?? ordenacao;
       const apenasDisponiveisFinal =
         filtros?.apenasDisponiveis ?? apenasDisponiveis;
-
-      const res = await axios.get("/api/pesquisar", {
+      const res = await axios.get<Produto[]>("/api/pesquisar", {
         params: {
           pesquisa: pesquisaFinal.trim(),
           categoria: categoriaFinal,
