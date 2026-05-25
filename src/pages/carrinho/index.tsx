@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import styles from "./style.module.css";
-
+interface CarrinhoResponse {
+  itens?: CarrinhoItem[];
+}
 interface Produto {
   id: number;
   nome: string;
@@ -73,11 +75,16 @@ export default function CarrinhoPage() {
     try {
       setLoading(true);
 
-      const res = await axios.get("/api/carrinho/listar", {
-        withCredentials: true,
-      });
+      const res = await axios.get<CarrinhoResponse | CarrinhoItem[]>(
+        "/api/carrinho/listar",
+        {
+          withCredentials: true,
+        },
+      );
 
-      const lista: CarrinhoItem[] = res.data.itens || res.data || [];
+      const lista: CarrinhoItem[] = Array.isArray(res.data)
+        ? res.data
+        : res.data.itens || [];
 
       setItens(lista);
       setSelecionados(lista.map((item) => item.id));
