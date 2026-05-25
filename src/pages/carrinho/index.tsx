@@ -100,7 +100,9 @@ export default function CarrinhoPage() {
     try {
       setRemovendoId(itemId);
 
-      await axios.delete("/api/carrinho/remover", {
+      await axios.request({
+        method: "DELETE",
+        url: "/api/carrinho/remover",
         data: {
           itemId,
         },
