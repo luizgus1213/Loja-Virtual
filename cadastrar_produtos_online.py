@@ -141,8 +141,8 @@ def login_admin(session: requests.Session):
     resposta = session.post(
         f"{BASE_URL}/api/auth/login",
         json={
-            "email": EMAIL_ADMIN,
-            "senha": SENHA_ADMIN,
+            "email": luizgus397@gmail.com,
+            "senha": Peixe2020!,
         },
         timeout=60,
     )
