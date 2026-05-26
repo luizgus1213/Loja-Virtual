@@ -64,7 +64,7 @@ const CardProduto = (prod: Produto) => {
       <div className={style["imagem-box"]}>
         <img
           className={style["card-imagem"]}
-          src={prod.capa?.link ? `/${prod.capa.link}` : "/sem-imagem.png"}
+          src={prod.capa?.link ? `/api/${prod.capa.link}` : "/sem-imagem.png"}
           alt={prod.nome}
         />
       </div>
