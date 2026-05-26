@@ -44,6 +44,8 @@ export default function AdminCupons() {
       setLoading(true);
       setAutorizado(false);
 
+      // Busca os cupons cadastrados na área admin.
+      // O tipo Cupom[] informa ao TypeScript que a API retorna uma lista de cupons.
       const res = await axios.get<Cupom[]>("/api/admin/cupons/listar", {
         withCredentials: true,
       });
@@ -51,6 +53,7 @@ export default function AdminCupons() {
       setCupons(res.data || []);
       setAutorizado(true);
     } catch (err: any) {
+      // Se der erro, o usuário provavelmente não está logado ou não é admin.
       setAutorizado(false);
 
       alert(err?.response?.data?.erro || "Acesso negado");
@@ -78,6 +81,7 @@ export default function AdminCupons() {
       await axios.post(
         "/api/admin/cupons/criar",
         {
+          // O código é salvo em maiúsculo para evitar diferença entre lg10, LG10 e Lg10.
           codigo: form.codigo.trim().toUpperCase(),
           tipo: form.tipo,
           valor: Number(form.valor),
@@ -86,6 +90,7 @@ export default function AdminCupons() {
           data_expiracao: form.data_expiracao || null,
         },
         {
+          // Envia o cookie de autenticação para o backend confirmar que o usuário é admin.
           withCredentials: true,
         },
       );
@@ -111,6 +116,8 @@ export default function AdminCupons() {
 
   async function alternarAtivo(cupomId: number) {
     try {
+      // Essa função alterna o status do cupom.
+      // Se estiver ativo, desativa. Se estiver inativo, ativa.
       await axios.put(
         "/api/admin/cupons/alternar-ativo",
         {
@@ -133,6 +140,7 @@ export default function AdminCupons() {
 
       if (!ok) return;
 
+      // Usa axios.request porque algumas tipagens do axios não aceitam data dentro de axios.delete.
       await axios.request({
         method: "DELETE",
         url: "/api/admin/cupons/excluir",
@@ -149,6 +157,7 @@ export default function AdminCupons() {
   }
 
   useEffect(() => {
+    // Carrega os cupons uma vez quando a página abre.
     carregarCupons();
   }, []);
 
@@ -321,6 +330,7 @@ export default function AdminCupons() {
                       <p>
                         <span>Valor</span>
                         <strong>
+                          {/* Se for cupom fixo, mostra em reais. Se for porcentagem, mostra com %. */}
                           {cupom.tipo === "fixo"
                             ? moeda(cupom.valor)
                             : `${cupom.valor}%`}

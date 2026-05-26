@@ -3,25 +3,30 @@ import axios from "axios";
 import styles from "./menu.module.css";
 import { useTema } from "@/contexts/ThemeContext";
 import { useRouter } from "next/router";
+
 const MenuHamburguer = () => {
   const [aberto, setAberto] = useState(false);
   const [user, setUser] = useState<any>(null);
+
   const { tema, setTema } = useTema();
   const router = useRouter();
 
   const carregarUsuario = async () => {
     try {
+      // Busca os dados do usuário logado usando o cookie de autenticação.
       const res = await axios.get("/api/auth/me", {
         withCredentials: true,
       });
 
       setUser(res.data);
     } catch {
+      // Se não tiver usuário logado ou o token for inválido, deixa o usuário como null.
       setUser(null);
     }
   };
 
   useEffect(() => {
+    // Carrega o usuário quando o componente aparece na tela.
     carregarUsuario();
   }, []);
 
@@ -49,6 +54,7 @@ const MenuHamburguer = () => {
             <button
               className={styles.botaoLogin}
               onClick={() => {
+                // Alterna o tema global do site entre light e dark.
                 if (tema === "light") setTema("dark");
                 else setTema("light");
               }}
@@ -58,6 +64,7 @@ const MenuHamburguer = () => {
                 : "Definir tema como Light"}
             </button>
 
+            {/* Renderização condicional: se existe usuário logado, mostra opções da conta; se não, mostra login. */}
             {user ? (
               <>
                 <img
@@ -69,6 +76,7 @@ const MenuHamburguer = () => {
                   alt="Foto de perfil"
                   className={styles.fotoTopo}
                 />
+
                 <h2 className={styles.nome}>{user.nome}</h2>
 
                 <div className={styles.areaBotoesUsuario}>
@@ -104,6 +112,8 @@ const MenuHamburguer = () => {
                   >
                     Compras
                   </button>
+
+                  {/* Botões administrativos aparecem somente se o usuário tiver acesso de admin. */}
                   {user?.acesso === "admin" && (
                     <>
                       <button
@@ -152,6 +162,7 @@ const MenuHamburguer = () => {
                 <button
                   className={styles.botaoSair}
                   onClick={async () => {
+                    // Faz logout no backend, limpa o usuário no front e recarrega a página.
                     await axios.post("/api/auth/logout");
                     setUser(null);
                     setAberto(false);

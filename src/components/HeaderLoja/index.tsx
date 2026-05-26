@@ -5,6 +5,7 @@ import axios from "axios";
 import MenuHamburguer from "@/components/Menu/MenuHamburguer";
 import styles from "./style.module.css";
 import NotificacoesSino from "@/components/NotificacoesSino";
+
 interface Endereco {
   id: number;
   rua: string;
@@ -39,23 +40,28 @@ export default function HeaderLoja() {
 
   async function carregarEndereco() {
     try {
+      // Busca os endereços do usuário logado e tipa a resposta como uma lista de Endereco.
       const res = await axios.get<Endereco[]>("/api/enderecos/listar", {
         withCredentials: true,
       });
 
       const lista: Endereco[] = res.data || [];
 
+      // Se o usuário tiver endereço cadastrado, mostra o primeiro no cabeçalho.
+      // Caso contrário, mostra a mensagem para informar endereço.
       if (lista.length > 0) {
         setEndereco(lista[0]);
       } else {
         setEndereco(null);
       }
     } catch {
+      // Se o usuário não estiver logado ou der erro na API, o endereço fica vazio.
       setEndereco(null);
     }
   }
 
   useEffect(() => {
+    // Executa uma vez quando o componente aparece na tela para carregar o endereço.
     carregarEndereco();
   }, []);
 
@@ -86,6 +92,7 @@ export default function HeaderLoja() {
           <div>
             <span>Enviar para</span>
 
+            {/* Renderização condicional: se existe endereço, mostra cidade/estado; se não, pede para informar. */}
             {endereco ? (
               <strong>
                 {endereco.cidade}/{endereco.estado}
@@ -105,7 +112,9 @@ export default function HeaderLoja() {
             <IconeCarrinho />
             <span>Carrinho</span>
           </button>
+
           <NotificacoesSino />
+
           <div className={styles.menuBox}>
             <MenuHamburguer />
           </div>

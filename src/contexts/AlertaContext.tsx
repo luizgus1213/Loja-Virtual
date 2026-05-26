@@ -22,6 +22,7 @@ interface ContextProps {
   ) => void;
 }
 
+// Cria um contexto global para permitir que qualquer componente do projeto chame exibirAlerta.
 const AlertaContext = createContext({} as ContextProps);
 
 export function AlertaProvider({ children }: { children: ReactNode }) {
@@ -33,8 +34,10 @@ export function AlertaProvider({ children }: { children: ReactNode }) {
     redirect?: string,
     tempo = 4000,
   ) {
+    // Usa Date.now para criar um id único para cada alerta.
     const id = Date.now();
 
+    // basicamente aq ele adiciona o novo alerta mantendo os alertas antigos.
     setAlertas((antigos) => [
       ...antigos,
       {
@@ -45,12 +48,14 @@ export function AlertaProvider({ children }: { children: ReactNode }) {
       },
     ]);
 
+    // Remove o alerta automaticamente depois do tempo definido.
     setTimeout(() => {
       removerAlerta(id);
     }, tempo);
   }
 
   function removerAlerta(id: number) {
+    // aqui ele filtra a lista e remove apenas o alerta com o id recebido.
     setAlertas((antigos) => antigos.filter((a) => a.id !== id));
   }
 
@@ -69,6 +74,7 @@ export function AlertaProvider({ children }: { children: ReactNode }) {
           gap: 12,
         }}
       >
+        {/* to utilizando pa renderizar todos os alertas ativos na tela. */}
         {alertas.map((alerta) => (
           <Alarmebonito
             key={alerta.id}
@@ -83,6 +89,7 @@ export function AlertaProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// Hook personalizado para acessar o contexto de alerta em qualquer componente.
 export function useAlerta() {
   return useContext(AlertaContext);
 }
