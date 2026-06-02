@@ -166,7 +166,7 @@ export default function AdminPedidos() {
   useEffect(() => {
     carregarPedidos();
   }, []);
-
+//esse useMemo que to utilizando é para evitar uma conta/filtro seja refeito ao rederizar a tela
   const pedidosFiltrados = useMemo(() => {
     return pedidos.filter((pedido) => {
       const texto = busca.toLowerCase().trim();

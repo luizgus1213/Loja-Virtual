@@ -1,5 +1,6 @@
 import User from "@/models/User";
 import Notificacao from "@/models/Notificacao";
+import { criarNotificacaoFirebase } from "@/lib/notificacoesFirebase";
 
 type TipoNotificacao = "pedido" | "promocao" | "seguranca";
 
@@ -47,6 +48,14 @@ export async function criarNotificacaoSePermitido({
   const permitido = usuarioAceitaNotificacao(user, tipo);
 
   if (!permitido) {
+    console.log("USUÁRIO NÃO ACEITA NOTIFICAÇÃO:", {
+      userId,
+      tipo,
+      notificar_pedidos: user.notificar_pedidos,
+      notificar_promocoes: user.notificar_promocoes,
+      notificar_seguranca: user.notificar_seguranca,
+    });
+
     return null;
   }
 
@@ -57,6 +66,14 @@ export async function criarNotificacaoSePermitido({
     mensagem,
     link,
     lida: false,
+  });
+
+  await criarNotificacaoFirebase({
+    userId,
+    tipo,
+    titulo,
+    mensagem,
+    link,
   });
 
   return notificacao;

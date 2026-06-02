@@ -1,22 +1,26 @@
-.wrapper {
+.container {
   position: relative;
 }
 
 .sino {
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
 
   border: 1px solid var(--border);
-  border-radius: 999px;
+  border-radius: 14px;
 
   background: var(--card);
   color: var(--foreground);
+
+  font-size: 20px;
 
   cursor: pointer;
 
   position: relative;
 
-  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   transition: 0.2s;
 }
@@ -26,7 +30,7 @@
   transform: translateY(-2px);
 }
 
-.sino span {
+.badge {
   position: absolute;
   top: -6px;
   right: -6px;
@@ -34,7 +38,7 @@
   min-width: 20px;
   height: 20px;
 
-  padding: 0 5px;
+  padding: 0 6px;
 
   border-radius: 999px;
 
@@ -47,49 +51,69 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
+  border: 2px solid var(--background);
 }
 
 .dropdown {
   position: absolute;
-  top: 52px;
+  top: 54px;
   right: 0;
 
-  width: min(360px, 90vw);
-  max-height: 480px;
-
-  overflow: hidden;
+  width: 360px;
+  max-width: calc(100vw - 24px);
 
   background: var(--card);
+  color: var(--foreground);
+
   border: 1px solid var(--border);
   border-radius: 20px;
 
-  box-shadow: var(--shadow);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
 
-  z-index: 999;
+  overflow: hidden;
+
+  z-index: 2000;
 }
 
 .topo {
-  padding: 14px;
-
-  border-bottom: 1px solid var(--border);
+  padding: 16px;
 
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 
-  gap: 10px;
+  gap: 12px;
+
+  border-bottom: 1px solid var(--border);
 }
 
 .topo strong {
+  display: block;
+
   font-size: 16px;
   font-weight: 900;
 }
 
+.topo span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: var(--text-secondary);
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .topo button {
   border: none;
-  background: transparent;
+  border-radius: 12px;
 
-  color: var(--button);
+  padding: 9px 11px;
+
+  background: var(--button);
+  color: white;
 
   font-size: 12px;
   font-weight: 900;
@@ -98,14 +122,15 @@
 }
 
 .lista {
-  max-height: 400px;
+  max-height: 420px;
+
   overflow-y: auto;
 }
 
 .item {
   width: 100%;
 
-  padding: 14px;
+  padding: 14px 16px;
 
   border: none;
   border-bottom: 1px solid var(--border);
@@ -138,28 +163,42 @@
 }
 
 .item p {
-  margin: 0 0 7px;
+  margin: 0 0 6px;
 
   color: var(--text-secondary);
 
   font-size: 13px;
   font-weight: 700;
+  line-height: 1.4;
 }
 
 .item small {
-  color: var(--text-secondary);
+  color: var(--button);
 
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .vazio {
-  margin: 0;
-  padding: 24px;
+  padding: 26px 18px;
 
   color: var(--text-secondary);
 
   text-align: center;
 
+  font-size: 14px;
   font-weight: 800;
+}
+
+@media (max-width: 520px) {
+  .dropdown {
+    position: fixed;
+
+    top: 72px;
+    left: 12px;
+    right: 12px;
+
+    width: auto;
+    max-width: none;
+  }
 }

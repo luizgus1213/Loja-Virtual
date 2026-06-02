@@ -4,6 +4,11 @@ import "@/models";
 
 import User from "@/models/User";
 import { protegerRota } from "@/lib/middleware";
+import { enviarCodigoEmail } from "@/lib/email";
+
+function gerarCodigo() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -24,16 +29,6 @@ export default async function handler(
       });
     }
 
-    const { codigo } = req.body;
-
-    const codigoLimpo = String(codigo || "").replace(/\D/g, "");
-
-    if (codigoLimpo.length !== 6) {
-      return res.status(400).json({
-        erro: "Código inválido",
-      });
-    }
-
     const user: any = await User.findByPk(userToken.id);
 
     if (!user) {
@@ -42,34 +37,31 @@ export default async function handler(
       });
     }
 
-    if (!user.email_pendente) {
+    const emailDestino = user.email_pendente || user.email;
+
+    if (!emailDestino) {
       return res.status(400).json({
-        erro: "Não existe email pendente para confirmar",
+        erro: "Nenhum email encontrado",
       });
     }
 
-    if (String(user.codigo_verificacao) !== codigoLimpo) {
-      return res.status(400).json({
-        erro: "Código inválido",
-      });
-    }
+    const codigo = gerarCodigo();
 
     await user.update({
-      email: user.email_pendente,
-      email_pendente: null,
-      email_verificado: true,
-      codigo_verificacao: null,
+      codigo_verificacao: codigo,
     });
+
+    await enviarCodigoEmail(emailDestino, codigo);
 
     return res.status(200).json({
       sucesso: true,
-      mensagem: "Email verificado com sucesso",
+      mensagem: "Código reenviado com sucesso",
     });
   } catch (err) {
-    console.log("ERRO AO CONFIRMAR EMAIL:", err);
+    console.error("ERRO AO REENVIAR CÓDIGO:", err);
 
     return res.status(500).json({
-      erro: "Erro interno",
+      erro: "Erro interno no servidor",
     });
   }
 }

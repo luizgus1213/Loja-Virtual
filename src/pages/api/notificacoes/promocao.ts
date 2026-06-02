@@ -4,7 +4,7 @@ import "@/models";
 
 import User from "@/models/User";
 import { verificarToken } from "@/lib/auth";
-import { criarNotificacaoSePermitido } from "@/lib/notificacoes";
+import { criarNotificacaoFirebase } from "@/lib/notificacoesFirebase";
 
 export default async function handler(
   req: NextApiRequest,
@@ -27,7 +27,7 @@ export default async function handler(
 
     const adminToken: any = verificarToken(token);
 
-    if (!adminToken) {
+    if (!adminToken?.id) {
       return res.status(401).json({
         erro: "Token inválido",
       });
@@ -51,29 +51,20 @@ export default async function handler(
       });
     }
 
-    if (titulo.length > 80) {
-      return res.status(400).json({
-        erro: "Título muito grande",
-      });
-    }
-
-    if (mensagem.length > 300) {
-      return res.status(400).json({
-        erro: "Mensagem muito grande",
-      });
-    }
-
     const users: any[] = await User.findAll({
-      where: {
-        conta_desativada: false,
-      },
-      attributes: ["id"],
+      attributes: ["id", "email", "acesso", "conta_desativada"],
     });
 
     let criadas = 0;
 
+    const idsEnviados: string[] = [];
+
     for (const user of users) {
-      const criada = await criarNotificacaoSePermitido({
+      if (user.conta_desativada === true || user.conta_desativada === 1) {
+        continue;
+      }
+
+      await criarNotificacaoFirebase({
         userId: user.id,
         tipo: "promocao",
         titulo,
@@ -81,14 +72,15 @@ export default async function handler(
         link,
       });
 
-      if (criada) {
-        criadas++;
-      }
+      criadas++;
+      idsEnviados.push(String(user.id));
     }
 
     return res.status(200).json({
       sucesso: true,
       criadas,
+      idsEnviados,
+      totalUsuariosEncontrados: users.length,
     });
   } catch (err) {
     console.error("ERRO NOTIFICAÇÃO PROMOÇÃO:", err);

@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import Image from "next/image";
+import { caminhoImagem } from "@/lib/imagem";
 import styles from "./styles.module.css";
 import { useRouter } from "next/router";
 import { ArrowLeft } from "lucide-react";
@@ -230,10 +232,11 @@ export default function Historico() {
                   <div className={styles.imagensPedidoPequenas}>
                     {(pedido.itens || []).slice(0, 3).map((item) => (
                       <div key={item.id} className={styles.imagemPedidoPequena}>
-                        <img
-                          src={`/${item.produto?.imagem?.link || "sem-imagem.png"}`}
+                        <Image
+                          src={caminhoImagem(item.produto?.imagem?.link)}
                           alt={item.produto?.nome || "Produto"}
-                          loading="lazy"
+                          fill
+                          sizes="54px"
                         />
 
                         {item.quantidade > 1 && (

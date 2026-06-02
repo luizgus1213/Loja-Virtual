@@ -81,7 +81,7 @@ export default function AdminCupons() {
       await axios.post(
         "/api/admin/cupons/criar",
         {
-          // O código é salvo em maiúsculo para evitar diferença entre lg10, LG10 e Lg10.
+          // defini o código para ser salvo em maiúsculo para evitar diferença entre lg10, LG10 e Lg10.
           codigo: form.codigo.trim().toUpperCase(),
           tipo: form.tipo,
           valor: Number(form.valor),
@@ -330,8 +330,7 @@ export default function AdminCupons() {
                       <p>
                         <span>Valor</span>
                         <strong>
-                          {/* Se for cupom fixo, mostra em reais. Se for porcentagem, mostra com %. */}
-                          {cupom.tipo === "fixo"
+                           {cupom.tipo === "fixo"
                             ? moeda(cupom.valor)
                             : `${cupom.valor}%`}
                         </strong>

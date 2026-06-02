@@ -3,7 +3,8 @@ import axios from "axios";
 import style from "./style.module.css";
 import { useAlerta } from "@/contexts/AlertaContext";
 import { useRouter } from "next/router";
-
+import Image from "next/image";
+import { caminhoImagem } from "@/lib/imagem";
 interface Produto {
   id: number;
   nome: string;
@@ -30,6 +31,7 @@ const CardProduto = (prod: Produto) => {
   }
 
   const favoritar = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Impede que o clique no botão de favoritar também acione o clique do card.
     e.stopPropagation();
 
     try {
@@ -39,6 +41,7 @@ const CardProduto = (prod: Produto) => {
           produtoId: prod.id,
         },
         {
+          // Envia o cookie do usuário logado para o backend identificar quem está favoritando.
           withCredentials: true,
         },
       );
@@ -55,6 +58,7 @@ const CardProduto = (prod: Produto) => {
       onClick={abrirProduto}
       role="button"
       tabIndex={0}
+      // Permite abrir o produto também pelo teclado usando Enter, melhorando a acessibilidade.
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           abrirProduto();
@@ -62,10 +66,12 @@ const CardProduto = (prod: Produto) => {
       }}
     >
       <div className={style["imagem-box"]}>
-        <img
+        <Image
           className={style["card-imagem"]}
-          src={prod.capa?.link ? `/api/${prod.capa.link}` : "/sem-imagem.png"}
+          src={caminhoImagem(prod.capa?.link)}
           alt={prod.nome}
+          fill
+          sizes="(max-width: 520px) 50vw, (max-width: 900px) 33vw, 250px"
         />
       </div>
 
@@ -89,6 +95,7 @@ const CardProduto = (prod: Produto) => {
         <div
           className={style["acoes"]}
           onClick={(e) => {
+            // Impede que clicar nos botões de ação abra a página do produto sem querer.
             e.stopPropagation();
           }}
         >
@@ -111,6 +118,7 @@ const CardProduto = (prod: Produto) => {
           </span>
 
           <span
+            // Se o estoque for zero, adiciona uma classe extra para estilizar como indisponível.
             className={`${style["card-estoque"]} ${
               prod.estoque <= 0 ? style["sem-estoque"] : ""
             }`}

@@ -24,15 +24,51 @@ export default function Auth() {
     }
   }, [router.query.modo]);
 
+  function emailValido(email: string) {
+    const emailLimpo = email.trim();
+
+    if (!emailLimpo.includes("@")) {
+      return false;
+    }
+
+    if (!emailLimpo.includes(".")) {
+      return false;
+    }
+
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailLimpo);
+  }
+
   async function enviar() {
     try {
-      if (!form.email.trim() || !form.senha.trim()) {
+      const emailLimpo = form.email.trim().toLowerCase();
+      const senhaLimpa = form.senha.trim();
+      const nomeLimpo = form.nome.trim();
+
+      if (!emailLimpo || !senhaLimpa) {
         exibirAlerta("Preencha email e senha", "erro");
         return;
       }
 
-      if (modo === "cadastro" && !form.nome.trim()) {
+      if (!emailValido(emailLimpo)) {
+        exibirAlerta(
+          "Digite um email válido com @. Exemplo: nome@gmail.com",
+          "erro",
+        );
+        return;
+      }
+
+      if (modo === "cadastro" && !nomeLimpo) {
         exibirAlerta("Preencha seu nome", "erro");
+        return;
+      }
+
+      if (modo === "cadastro" && nomeLimpo.length < 3) {
+        exibirAlerta("O nome precisa ter pelo menos 3 letras", "erro");
+        return;
+      }
+
+      if (senhaLimpa.length < 6) {
+        exibirAlerta("A senha precisa ter pelo menos 6 caracteres", "erro");
         return;
       }
 
@@ -42,7 +78,7 @@ export default function Auth() {
         await axios.post(
           "/api/auth/login",
           {
-            email: form.email.trim(),
+            email: emailLimpo,
             senha: form.senha,
           },
           {
@@ -50,15 +86,20 @@ export default function Auth() {
           },
         );
 
-        window.location.href = "/";
+        exibirAlerta("Login realizado com sucesso!", "sucesso");
+
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 700);
+
         return;
       }
 
       await axios.post(
         "/api/auth/registrar",
         {
-          nome: form.nome.trim(),
-          email: form.email.trim(),
+          nome: nomeLimpo,
+          email: emailLimpo,
           senha: form.senha,
         },
         {
@@ -68,7 +109,10 @@ export default function Auth() {
 
       exibirAlerta("Código enviado para seu email!", "sucesso");
 
-      window.location.href = "/verificar-email?email=" + form.email.trim();
+      setTimeout(() => {
+        window.location.href =
+          "/verificar-email?email=" + encodeURIComponent(emailLimpo);
+      }, 900);
     } catch (err: any) {
       exibirAlerta(err?.response?.data?.erro || "Erro ao autenticar", "erro");
     } finally {

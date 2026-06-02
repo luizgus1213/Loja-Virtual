@@ -5,7 +5,8 @@ import CaixaPesquisa from "@/components/CaixaPesquisa";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAlerta } from "@/contexts/AlertaContext";
-
+import Image from "next/image";
+import { caminhoImagem } from "@/lib/imagem";
 interface Produto {
   id: number;
   nome: string;
@@ -447,11 +448,13 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
                 onTouchStart={tocarInicio}
                 onTouchEnd={tocarFim}
               >
-                <img
+                <Image
                   className={styles.imagemPrincipal}
-                  src={`/${imagemPrincipal}`}
+                  src={caminhoImagem(imagemPrincipal)}
                   alt={produto.nome}
-                  loading="lazy"
+                  fill
+                  sizes="(max-width: 1000px) 100vw, 650px"
+                  priority
                 />
 
                 {imagensProduto.length > 1 && (
@@ -488,10 +491,11 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
                       }`}
                       onClick={() => setImagemAtual(index)}
                     >
-                      <img
-                        src={`/${img.arquivo.link}`}
+                      <Image
+                        src={caminhoImagem(img.arquivo.link)}
                         alt={`${produto.nome} ${index + 1}`}
-                        loading="lazy"
+                        fill
+                        sizes="78px"
                       />
                     </button>
                   ))}
@@ -733,10 +737,11 @@ export default function ProdutoPage({ produto, relacionados }: Props) {
                       onClick={() => router.push(`/produto/${item.id}`)}
                     >
                       <div className={styles.imagemRelacionadoBox}>
-                        <img
-                          src={`/${imagem}`}
+                        <Image
+                          src={caminhoImagem(imagem)}
                           alt={item.nome}
-                          loading="lazy"
+                          fill
+                          sizes="(max-width: 520px) 50vw, 220px"
                           className={styles.imagemRelacionado}
                         />
                       </div>

@@ -1,9 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-
 import "@/models";
-
-import Notificacao from "@/models/Notificacao";
+import User from "@/models/User";
 import { verificarToken } from "@/lib/auth";
+import { adminDb } from "@/lib/firebaseAdmin";
 
 export default async function handler(
   req: NextApiRequest,
@@ -24,38 +23,51 @@ export default async function handler(
       });
     }
 
-    const user: any = verificarToken(token);
+    const userToken: any = verificarToken(token);
 
-    if (!user) {
+    if (!userToken?.id) {
       return res.status(401).json({
         erro: "Token inválido",
       });
     }
 
-    const notificacaoId = Number(req.body.notificacaoId);
+    const user: any = await User.findByPk(userToken.id);
 
-    if (!notificacaoId || Number.isNaN(notificacaoId)) {
+    if (!user) {
+      return res.status(404).json({
+        erro: "Usuário não encontrado",
+      });
+    }
+
+    const notificacaoId = String(req.body.notificacaoId || "");
+
+    if (!notificacaoId) {
       return res.status(400).json({
         erro: "Notificação inválida",
       });
     }
 
-    const notificacao: any = await Notificacao.findOne({
-      where: {
-        id: notificacaoId,
-        user_id: user.id,
-      },
-    });
+    const ref = adminDb.collection("notificacoes").doc(notificacaoId);
+    const doc = await ref.get();
 
-    if (!notificacao) {
+    if (!doc.exists) {
       return res.status(404).json({
         erro: "Notificação não encontrada",
       });
     }
 
-    notificacao.lida = true;
+    const dados = doc.data();
 
-    await notificacao.save();
+    if (String(dados?.userId) !== String(user.id)) {
+      return res.status(403).json({
+        erro: "Acesso negado",
+      });
+    }
+
+    await ref.update({
+      lida: true,
+      readAt: new Date(),
+    });
 
     return res.status(200).json({
       sucesso: true,

@@ -19,7 +19,11 @@ export const ContextoTema = createContext<ThemeContextData | undefined>(
   undefined,
 );
 
-export const ThemeProvider = ({ children }: { children: ReactNode }) => {
+export const ThemeProvider = ({
+  children: conteudo,
+}: {
+  children: ReactNode;
+}) => {
   const [tema, setTema] = useState<"light" | "dark">("dark");
 
   useEffect(() => {
@@ -40,7 +44,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <ContextoTema.Provider value={{ tema, setTema }}>
-      {children}
+      {conteudo}
     </ContextoTema.Provider>
   );
 };

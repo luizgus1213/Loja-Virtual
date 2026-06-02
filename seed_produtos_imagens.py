@@ -7,8 +7,7 @@ from datetime import datetime
 
 BASE_DIR = Path(__file__).parent
 DB_PATH = BASE_DIR / "database.sqlite"
-UPLOADS_DIR = BASE_DIR / "public" / "uploads"
-
+UPLOADS_DIR = BASE_DIR / "uploads"
 # MUDE AQUI PARA A PASTA ONDE ESTÃO SUAS IMAGENS
 PASTA_IMAGENS = Path(r"C:\Users\Luiz Gustavo\Desktop\react\lg_trambicagens\imagens_produtos")
 

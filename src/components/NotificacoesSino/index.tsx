@@ -1,53 +1,104 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import styles from "./style.module.css";
 
+import { firebaseAuth, firebaseDb } from "@/lib/firebaseClient";
+import { signInWithCustomToken, onAuthStateChanged } from "firebase/auth";
+import {
+  collection,
+  onSnapshot,
+  query,
+  where,
+  Timestamp,
+} from "firebase/firestore";
+
+interface FirebaseTokenResponse {
+  token: string;
+  uid: string;
+}
+
 interface Notificacao {
-  id: number;
+  id: string;
+  userId: string;
   tipo: string;
   titulo: string;
   mensagem: string;
   link?: string | null;
   lida: boolean;
-  createdAt: string;
+  createdAt?: any;
 }
 
-// Tipo da resposta da API. Ela retorna a lista de notificações e a quantidade de não lidas.
-interface NotificacoesResponse {
-  notificacoes: Notificacao[];
-  naoLidas: number;
+function formatarData(data: any) {
+  try {
+    if (!data) return "";
+
+    if (data instanceof Timestamp) {
+      return data.toDate().toLocaleString("pt-BR");
+    }
+
+    if (data?.seconds) {
+      return new Date(data.seconds * 1000).toLocaleString("pt-BR");
+    }
+
+    return new Date(data).toLocaleString("pt-BR");
+  } catch {
+    return "";
+  }
+}
+
+function pegarTempo(data: any) {
+  try {
+    if (!data) return 0;
+
+    if (data instanceof Timestamp) {
+      return data.toDate().getTime();
+    }
+
+    if (data?.seconds) {
+      return data.seconds * 1000;
+    }
+
+    return new Date(data).getTime();
+  } catch {
+    return 0;
+  }
 }
 
 export default function NotificacoesSino() {
   const router = useRouter();
 
   const [aberto, setAberto] = useState(false);
+  const [uid, setUid] = useState("");
   const [notificacoes, setNotificacoes] = useState<Notificacao[]>([]);
-  const [naoLidas, setNaoLidas] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-  async function carregar() {
+  const iniciouRef = useRef(false);
+
+  const naoLidas = useMemo(() => {
+    return notificacoes.filter((n) => !n.lida).length;
+  }, [notificacoes]);
+
+  async function autenticarFirebase() {
     try {
-      // Busca as notificações do usuário logado usando o cookie de autenticação.
-      const res = await axios.get<NotificacoesResponse>(
-        "/api/notificacoes/listar",
+      const res = await axios.get<FirebaseTokenResponse>(
+        "/api/firebase/token",
         {
           withCredentials: true,
         },
       );
 
-      setNotificacoes(res.data.notificacoes || []);
-      setNaoLidas(Number(res.data.naoLidas || 0));
-    } catch {
-      // Se o usuário não estiver logado ou der erro, o sino fica sem notificações.
-      setNotificacoes([]);
-      setNaoLidas(0);
+      await signInWithCustomToken(firebaseAuth, res.data.token);
+
+      setUid(res.data.uid);
+    } catch (err) {
+      console.log("ERRO AO AUTENTICAR FIREBASE:", err);
+      setLoading(false);
     }
   }
 
-  async function abrirNotificacao(notificacao: Notificacao) {
+  async function marcarComoLida(notificacao: Notificacao) {
     try {
-      // Se a notificação ainda não foi lida, marca como lida antes de abrir o link.
       if (!notificacao.lida) {
         await axios.put(
           "/api/notificacoes/marcar-lida",
@@ -60,21 +111,19 @@ export default function NotificacoesSino() {
         );
       }
 
-      await carregar();
-
-      // Se a notificação tiver link, redireciona o usuário para a página relacionada.
       if (notificacao.link) {
         router.push(notificacao.link);
       }
-    } catch {
-      // Mesmo se der erro ao marcar como lida, ainda tenta abrir o link da notificação.
+    } catch (err) {
+      console.log("ERRO AO MARCAR NOTIFICAÇÃO:", err);
+
       if (notificacao.link) {
         router.push(notificacao.link);
       }
     }
   }
 
-  async function marcarTodas() {
+  async function marcarTodasComoLidas() {
     try {
       await axios.put(
         "/api/notificacoes/marcar-todas-lidas",
@@ -83,51 +132,97 @@ export default function NotificacoesSino() {
           withCredentials: true,
         },
       );
-
-      await carregar();
-    } catch {
-      alert("Erro ao marcar notificações");
+    } catch (err) {
+      console.log("ERRO AO MARCAR TODAS:", err);
     }
   }
 
   useEffect(() => {
-    carregar();
+    if (iniciouRef.current) return;
 
-    // Atualiza as notificações automaticamente a cada 30 segundos.
-    const intervalo = setInterval(() => {
-      carregar();
-    }, 30000);
+    iniciouRef.current = true;
 
-    // Limpa o intervalo quando o componente sai da tela para evitar consumo desnecessário.
-    return () => clearInterval(intervalo);
+    autenticarFirebase();
   }, []);
 
+  useEffect(() => {
+    const unsubscribeAuth = onAuthStateChanged(firebaseAuth, (user) => {
+      if (user?.uid) {
+        setUid(user.uid);
+      }
+    });
+
+    return () => unsubscribeAuth();
+  }, []);
+
+  useEffect(() => {
+    if (!uid) return;
+
+    setLoading(true);
+
+    const q = query(
+      collection(firebaseDb, "notificacoes"),
+      where("userId", "==", String(uid)),
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const lista = snapshot.docs.map((doc) => {
+          const data = doc.data() as Omit<Notificacao, "id">;
+
+          return {
+            id: doc.id,
+            ...data,
+          };
+        });
+
+        const ordenadas = lista.sort((a, b) => {
+          return pegarTempo(b.createdAt) - pegarTempo(a.createdAt);
+        });
+
+        setNotificacoes(ordenadas.slice(0, 20));
+        setLoading(false);
+      },
+      (err) => {
+        console.log("ERRO AO OUVIR NOTIFICAÇÕES:", err);
+        setLoading(false);
+      },
+    );
+
+    return () => unsubscribe();
+  }, [uid]);
+
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.container}>
       <button
         type="button"
         className={styles.sino}
         onClick={() => setAberto(!aberto)}
       >
         🔔
-        {naoLidas > 0 && <span>{naoLidas > 9 ? "9+" : naoLidas}</span>}
+        {naoLidas > 0 && <span className={styles.badge}>{naoLidas}</span>}
       </button>
 
       {aberto && (
         <div className={styles.dropdown}>
           <div className={styles.topo}>
-            <strong>Notificações</strong>
+            <div>
+              <strong>Notificações</strong>
+              <span>{naoLidas} não lida(s)</span>
+            </div>
 
             {naoLidas > 0 && (
-              <button type="button" onClick={marcarTodas}>
-                Marcar lidas
+              <button type="button" onClick={marcarTodasComoLidas}>
+                Marcar todas
               </button>
             )}
           </div>
 
-          {/* Renderização condicional: se não tiver notificações, mostra mensagem; se tiver, mostra a lista. */}
-          {notificacoes.length === 0 ? (
-            <p className={styles.vazio}>Nenhuma notificação</p>
+          {loading ? (
+            <div className={styles.vazio}>Carregando...</div>
+          ) : notificacoes.length === 0 ? (
+            <div className={styles.vazio}>Nenhuma notificação ainda.</div>
           ) : (
             <div className={styles.lista}>
               {notificacoes.map((notificacao) => (
@@ -137,13 +232,13 @@ export default function NotificacoesSino() {
                   className={`${styles.item} ${
                     !notificacao.lida ? styles.naoLida : ""
                   }`}
-                  onClick={() => abrirNotificacao(notificacao)}
+                  onClick={() => marcarComoLida(notificacao)}
                 >
-                  <strong>{notificacao.titulo}</strong>
-                  <p>{notificacao.mensagem}</p>
-                  <small>
-                    {new Date(notificacao.createdAt).toLocaleString("pt-BR")}
-                  </small>
+                  <div>
+                    <strong>{notificacao.titulo}</strong>
+                    <p>{notificacao.mensagem}</p>
+                    <small>{formatarData(notificacao.createdAt)}</small>
+                  </div>
                 </button>
               ))}
             </div>

@@ -217,20 +217,6 @@
   font-weight: 900;
 }
 
-.imagemProduto {
-  width: 110px;
-  height: 110px;
-
-  object-fit: contain;
-
-  padding: 8px;
-
-  border-radius: 18px;
-
-  background: var(--input);
-  border: 1px solid var(--border);
-}
-
 .infoProduto h2 {
   margin: 0 0 6px 0;
 
@@ -678,7 +664,7 @@
     gap: 12px;
   }
 
-  .imagemProduto {
+  .imagemProdutoBox {
     width: 82px;
     height: 82px;
   }
@@ -715,7 +701,7 @@
     margin: 0 auto;
   }
 
-  .imagemProduto {
+  .imagemProdutoBox {
     margin: 0 auto;
   }
 
@@ -867,30 +853,47 @@
 
   gap: 12px;
 }
+.imagemProdutoBox {
+  position: relative;
 
-.produtoTopoCard {
-  width: 100%;
+  width: 110px;
+  height: 110px;
 
-  padding: 10px;
-
-  border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 18px;
 
   background: var(--input);
-  color: var(--foreground);
+  border: 1px solid var(--border);
 
-  display: flex;
-  align-items: center;
-
-  gap: 10px;
-
-  text-align: left;
-
-  cursor: pointer;
-
-  transition: 0.2s;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
+.imagemProduto {
+  object-fit: contain;
+
+  padding: 8px;
+}
+
+.produtoTopoImagemBox {
+  position: relative;
+
+  width: 52px;
+  height: 52px;
+
+  border-radius: 12px;
+
+  background: var(--card);
+  border: 1px solid var(--border);
+
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.produtoTopoImagem {
+  object-fit: contain;
+
+  padding: 5px;
+}
 .produtoTopoCard:hover {
   border-color: var(--button);
   transform: translateY(-2px);
@@ -899,22 +902,6 @@
 .produtoTopoSelecionado {
   border-color: var(--button);
   background: rgba(52, 131, 250, 0.12);
-}
-
-.produtoTopoCard img {
-  width: 52px;
-  height: 52px;
-
-  object-fit: contain;
-
-  border-radius: 12px;
-
-  background: var(--card);
-  border: 1px solid var(--border);
-
-  padding: 5px;
-
-  flex-shrink: 0;
 }
 
 .produtoTopoCard div {
@@ -1022,4 +1009,152 @@
   font-weight: 900;
 
   cursor: pointer;
+}
+.produtoTopoImagemBox {
+  position: relative;
+
+  width: 52px;
+  height: 52px;
+
+  border-radius: 12px;
+
+  background: var(--card);
+  border: 1px solid var(--border);
+
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* CARD PEQUENO DO TOPO DO CARRINHO */
+
+.produtoTopoCard {
+  width: 100%;
+
+  padding: 10px;
+
+  border: 1px solid var(--border);
+  border-radius: 16px;
+
+  background: var(--input);
+  color: var(--foreground);
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.produtoTopoCard:hover {
+  border-color: var(--button);
+  transform: translateY(-2px);
+}
+
+.produtoTopoSelecionado {
+  border-color: var(--button);
+  background: rgba(52, 131, 250, 0.12);
+}
+
+.produtoTopoImagemBox {
+  position: relative;
+
+  width: 52px;
+  height: 52px;
+
+  min-width: 52px;
+  max-width: 52px;
+
+  border-radius: 12px;
+
+  background: var(--card);
+  border: 1px solid var(--border);
+
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.produtoTopoImagem {
+  object-fit: contain;
+  padding: 5px;
+}
+
+.produtoTopoCard div:not(.produtoTopoImagemBox) {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.produtoTopoCard strong {
+  font-size: 13px;
+  font-weight: 900;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.produtoTopoCard span {
+  color: var(--button);
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+/* IMAGEM GRANDE DA LISTA PRINCIPAL */
+
+.imagemProdutoBox {
+  position: relative;
+
+  width: 110px;
+  height: 110px;
+
+  min-width: 110px;
+  max-width: 110px;
+
+  border-radius: 18px;
+
+  background: var(--input);
+  border: 1px solid var(--border);
+
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.imagemProduto {
+  object-fit: contain;
+  padding: 8px;
+}
+
+/* RESPONSIVO */
+
+@media (max-width: 650px) {
+  .imagemProdutoBox {
+    width: 82px;
+    height: 82px;
+
+    min-width: 82px;
+    max-width: 82px;
+  }
+
+  .produtoTopoImagemBox {
+    width: 48px;
+    height: 48px;
+
+    min-width: 48px;
+    max-width: 48px;
+  }
+}
+
+@media (max-width: 430px) {
+  .imagemProdutoBox {
+    margin: 0 auto;
+  }
 }

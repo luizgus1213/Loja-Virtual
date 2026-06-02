@@ -27,7 +27,7 @@ export default async function handler(
 
     const adminToken: any = verificarToken(token);
 
-    if (!adminToken) {
+    if (!adminToken?.id) {
       return res.status(401).json({
         erro: "Token inválido",
       });
@@ -52,15 +52,20 @@ export default async function handler(
     }
 
     const users: any[] = await User.findAll({
-      where: {
-        conta_desativada: false,
-      },
-      attributes: ["id"],
+      attributes: ["id", "email", "conta_desativada", "notificar_promocoes"],
     });
 
     let criadas = 0;
+    let ignoradas = 0;
+
+    const idsEnviados: string[] = [];
 
     for (const user of users) {
+      if (user.conta_desativada === true || user.conta_desativada === 1) {
+        ignoradas++;
+        continue;
+      }
+
       const criada = await criarNotificacaoSePermitido({
         userId: user.id,
         tipo: "promocao",
@@ -71,18 +76,24 @@ export default async function handler(
 
       if (criada) {
         criadas++;
+        idsEnviados.push(String(user.id));
+      } else {
+        ignoradas++;
       }
     }
 
     return res.status(200).json({
       sucesso: true,
       criadas,
+      ignoradas,
+      idsEnviados,
+      totalUsuariosEncontrados: users.length,
     });
-  } catch (err) {
+  } catch (err: any) {
     console.error("ERRO NOTIFICAÇÃO PROMOÇÃO:", err);
 
     return res.status(500).json({
-      erro: "Erro interno no servidor",
+      erro: err?.message || "Erro interno no servidor",
     });
   }
 }

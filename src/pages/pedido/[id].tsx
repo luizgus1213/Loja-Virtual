@@ -1,6 +1,8 @@
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import Image from "next/image";
+import { caminhoImagem } from "@/lib/imagem";
 import styles from "./style.module.css";
 interface PedidoResponse {
   pedido: Pedido;
@@ -429,7 +431,11 @@ export default function PedidoPage() {
       setPagando(false);
     }
   }
+  function baixarRecibo() {
+    if (!pedido) return;
 
+    window.open(`/api/pedido/recibo?pedidoId=${pedido.id}`, "_blank");
+  }
   useEffect(() => {
     if (!router.isReady) return;
 
@@ -491,13 +497,23 @@ export default function PedidoPage() {
               <p>{new Date(pedido.createdAt).toLocaleString("pt-BR")}</p>
             </div>
 
-            <span
-              className={`${styles.status} ${
-                styles[`status_${pedido.status}`] || ""
-              }`}
-            >
-              {formatarStatus(pedido.status)}
-            </span>
+            <div className={styles.acoesTopoPedido}>
+              <span
+                className={`${styles.status} ${
+                  styles[`status_${pedido.status}`] || ""
+                }`}
+              >
+                {formatarStatus(pedido.status)}
+              </span>
+
+              <button
+                type="button"
+                className={styles.botaoRecibo}
+                onClick={baixarRecibo}
+              >
+                Baixar recibo
+              </button>
+            </div>
           </div>
 
           <section className={styles.timelineCard}>
@@ -585,11 +601,15 @@ export default function PedidoPage() {
 
                 return (
                   <article key={item.id} className={styles.itemCard}>
-                    <img
-                      src={`/${imagem}`}
-                      alt={item.produto?.nome || "Produto"}
-                      className={styles.itemImagem}
-                    />
+                    <div className={styles.itemImagemBox}>
+                      <Image
+                        src={caminhoImagem(imagem)}
+                        alt={item.produto?.nome || "Produto"}
+                        fill
+                        sizes="96px"
+                        className={styles.itemImagem}
+                      />
+                    </div>
 
                     <div className={styles.itemInfo}>
                       <h3>{item.produto?.nome || "Produto"}</h3>

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import styles from "./informacoes.module.css";
-
+import { useAlerta } from "@/contexts/AlertaContext";
 interface User {
   id: number;
   nome: string;
@@ -18,7 +18,7 @@ interface User {
 
 export default function InformacoesPage() {
   const router = useRouter();
-
+  const { exibirAlerta } = useAlerta();
   const [user, setUser] = useState<User | null>(null);
 
   const [nome, setNome] = useState("");
@@ -62,7 +62,7 @@ export default function InformacoesPage() {
     if (!arquivo) return;
 
     if (!arquivo.type.startsWith("image/")) {
-      alert("Selecione apenas uma imagem");
+      exibirAlerta("Selecione apenas uma imagem", "erro");
       return;
     }
 
@@ -77,7 +77,7 @@ export default function InformacoesPage() {
   async function salvarFoto() {
     try {
       if (!foto) {
-        alert("Selecione uma foto primeiro");
+        exibirAlerta("Selecione uma foto primeiro", "erro");
         return;
       }
 
@@ -93,7 +93,7 @@ export default function InformacoesPage() {
         withCredentials: true,
       });
 
-      alert("Foto atualizada!");
+      exibirAlerta("Foto atualizada!", "sucesso");
 
       setFoto(null);
 
@@ -106,27 +106,29 @@ export default function InformacoesPage() {
       await carregarPerfil();
     } catch (err: any) {
       console.log(err);
-      alert(err?.response?.data?.erro || "Erro ao atualizar foto");
+      exibirAlerta(
+        err?.response?.data?.erro || "Erro ao atualizar foto",
+        "erro",
+      );
     } finally {
       setEnviandoFoto(false);
     }
   }
-
   async function salvarPerfil() {
     try {
       if (!nome.trim()) {
-        alert("Informe seu nome");
+        exibirAlerta("Informe seu nome", "erro");
         return;
       }
 
       if (!email.trim()) {
-        alert("Informe seu email");
+        exibirAlerta("Informe seu email", "erro");
         return;
       }
 
       setSalvando(true);
 
-      await axios.put(
+      const res = await axios.put(
         "/api/perfil/atualizar",
         {
           nome: nome.trim(),
@@ -139,12 +141,24 @@ export default function InformacoesPage() {
         },
       );
 
-      alert("Informações atualizadas!");
+      exibirAlerta(res.data?.mensagem || "Informações atualizadas!", "sucesso");
+
+      if (res.data?.emailAlterado) {
+        setTimeout(() => {
+          router.push("/verificar-email");
+        }, 800);
+
+        return;
+      }
 
       await carregarPerfil();
     } catch (err: any) {
       console.log(err);
-      alert(err?.response?.data?.erro || "Erro ao atualizar perfil");
+
+      exibirAlerta(
+        err?.response?.data?.erro || "Erro ao atualizar perfil",
+        "erro",
+      );
     } finally {
       setSalvando(false);
     }

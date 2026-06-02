@@ -8,10 +8,7 @@ export interface NextApiComArquivo extends NextApiRequest {
   files?: Express.Multer.File[];
 }
 
-const pastaUploads =
-  process.env.NODE_ENV === "production"
-    ? "/var/data/uploads"
-    : path.join(process.cwd(), "public", "uploads");
+const pastaUploads = path.join(process.cwd(), "uploads");
 
 if (!fs.existsSync(pastaUploads)) {
   fs.mkdirSync(pastaUploads, {
@@ -26,7 +23,9 @@ const storage = multer.diskStorage({
 
   filename: function (req, file, cb) {
     const extensao = path.extname(file.originalname);
-    const nomeUnico = `${Date.now()}-${Math.round(Math.random() * 1e9)}${extensao}`;
+    const nomeUnico = `${Date.now()}-${Math.round(
+      Math.random() * 1e9,
+    )}${extensao}`;
 
     cb(null, nomeUnico);
   },
@@ -41,6 +40,7 @@ const upload = multer({
       "image/png",
       "image/webp",
       "image/jpg",
+      "image/svg+xml",
     ];
 
     if (!tiposPermitidos.includes(file.mimetype)) {
@@ -86,10 +86,6 @@ export async function uploadVariosArquivos(
 }
 
 export function obterLinkArquivo(nomeArquivo: string) {
-  if (process.env.NODE_ENV === "production") {
-    return `api/uploads/${nomeArquivo}`;
-  }
-
   return `uploads/${nomeArquivo}`;
 }
 

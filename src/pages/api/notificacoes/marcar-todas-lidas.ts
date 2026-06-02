@@ -1,9 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-
 import "@/models";
-
-import Notificacao from "@/models/Notificacao";
+import User from "@/models/User";
 import { verificarToken } from "@/lib/auth";
+import { adminDb } from "@/lib/firebaseAdmin";
 
 export default async function handler(
   req: NextApiRequest,
@@ -24,28 +23,49 @@ export default async function handler(
       });
     }
 
-    const user: any = verificarToken(token);
+    const userToken: any = verificarToken(token);
 
-    if (!user) {
+    if (!userToken?.id) {
       return res.status(401).json({
         erro: "Token inválido",
       });
     }
 
-    await Notificacao.update(
-      {
+    const user: any = await User.findByPk(userToken.id);
+
+    if (!user) {
+      return res.status(404).json({
+        erro: "Usuário não encontrado",
+      });
+    }
+
+    const snapshot = await adminDb
+      .collection("notificacoes")
+      .where("userId", "==", String(user.id))
+      .where("lida", "==", false)
+      .get();
+
+    if (snapshot.empty) {
+      return res.status(200).json({
+        sucesso: true,
+        alteradas: 0,
+      });
+    }
+
+    const batch = adminDb.batch();
+
+    snapshot.docs.forEach((doc) => {
+      batch.update(doc.ref, {
         lida: true,
-      },
-      {
-        where: {
-          user_id: user.id,
-          lida: false,
-        },
-      },
-    );
+        readAt: new Date(),
+      });
+    });
+
+    await batch.commit();
 
     return res.status(200).json({
       sucesso: true,
+      alteradas: snapshot.size,
     });
   } catch (err) {
     console.error("ERRO MARCAR TODAS NOTIFICAÇÕES:", err);

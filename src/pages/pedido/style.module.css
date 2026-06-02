@@ -1151,3 +1151,46 @@
   opacity: 0.65;
   cursor: not-allowed;
 }
+.acoesTopoPedido {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.botaoRecibo {
+  padding: 10px 14px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: var(--button);
+  color: white;
+
+  font-size: 13px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+
+  white-space: nowrap;
+}
+
+.botaoRecibo:hover {
+  background: var(--button-hover);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 650px) {
+  .acoesTopoPedido {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .botaoRecibo {
+    width: 100%;
+  }
+}

@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import styles from "./style.module.css";
-
+import Image from "next/image";
+import { caminhoImagem } from "@/lib/imagem";
 interface ItemCarrinho {
   id: number;
   quantidade: number;
@@ -354,11 +355,14 @@ export default function CheckoutPage() {
                         checked={selecionado}
                         onChange={() => alternarItem(item.id)}
                       />
-
-                      <img
-                        src={`/${obterImagem(item)}`}
-                        alt={item.produto.nome}
-                      />
+                      <div className={styles.itemImagemBox}>
+                        <Image
+                          src={caminhoImagem(obterImagem(item))}
+                          alt={item.produto.nome}
+                          fill
+                          sizes="84px"
+                        />
+                      </div>
 
                       <div className={styles.itemInfo}>
                         <h3>{item.produto.nome}</h3>

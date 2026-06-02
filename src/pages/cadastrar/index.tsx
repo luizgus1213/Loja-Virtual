@@ -10,8 +10,12 @@ import { useAlerta } from "@/contexts/AlertaContext";
 interface Produto {
   id: number;
   nome: string;
+  marca: string;
+  categoria: string;
+  descricao: string;
   preco: number;
   avaliacao: number;
+  estoque: number;
 
   imagem?: {
     link: string;
@@ -57,6 +61,7 @@ export default function AdicionarItens() {
   const [salvando, setSalvando] = useState(false);
   const [carregando, setCarregando] = useState(true);
   const [autorizado, setAutorizado] = useState(false);
+  const [editandoId, setEditandoId] = useState<number | null>(null);
 
   async function verificarAdmin() {
     try {
@@ -97,7 +102,102 @@ export default function AdicionarItens() {
       setSalvando(false);
     }
   }
+  function abrirEdicao(produtoSelecionado: Produto) {
+    setEditandoId(produtoSelecionado.id);
 
+    setProduto({
+      nome: produtoSelecionado.nome || "",
+      marca: produtoSelecionado.marca || "",
+      categoria: produtoSelecionado.categoria || "",
+      descricao: produtoSelecionado.descricao || "",
+      preco: Number(produtoSelecionado.preco || 0),
+      estoque: Number(produtoSelecionado.estoque || 0),
+      promocao: false,
+      avaliacao: Number(produtoSelecionado.avaliacao || 0),
+    });
+
+    setImagens([]);
+
+    preview.forEach((img) => URL.revokeObjectURL(img));
+    setPreview([]);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
+
+  function cancelarEdicao() {
+    setEditandoId(null);
+    setProduto(produtoInicial);
+    setImagens([]);
+
+    preview.forEach((img) => URL.revokeObjectURL(img));
+    setPreview([]);
+  }
+
+  async function salvarEdicaoProduto() {
+    try {
+      if (!editandoId) {
+        return exibirAlerta("Nenhum produto selecionado para editar", "erro");
+      }
+
+      if (!produto.nome.trim()) {
+        return exibirAlerta("Informe o nome do produto", "erro");
+      }
+
+      if (!produto.marca.trim()) {
+        return exibirAlerta("Informe a marca do produto", "erro");
+      }
+
+      if (!produto.categoria.trim()) {
+        return exibirAlerta("Informe a categoria do produto", "erro");
+      }
+
+      if (!produto.descricao.trim()) {
+        return exibirAlerta("Informe a descrição do produto", "erro");
+      }
+
+      if (Number(produto.preco) <= 0) {
+        return exibirAlerta("Informe um preço válido", "erro");
+      }
+
+      if (!Number.isInteger(Number(produto.estoque)) || produto.estoque < 0) {
+        return exibirAlerta("Informe um estoque válido", "erro");
+      }
+
+      setSalvando(true);
+
+      await axios.put(
+        "/api/admin/produtos/editar",
+        {
+          id: editandoId,
+          nome: produto.nome.trim(),
+          marca: produto.marca.trim(),
+          categoria: produto.categoria.trim(),
+          descricao: produto.descricao.trim(),
+          preco: produto.preco,
+          estoque: produto.estoque,
+        },
+        {
+          withCredentials: true,
+        },
+      );
+
+      exibirAlerta("Produto atualizado com sucesso!", "sucesso");
+
+      cancelarEdicao();
+      carregarProdutos();
+    } catch (err: any) {
+      console.error(err);
+      exibirAlerta(
+        err?.response?.data?.erro || "Erro ao editar produto",
+        "erro",
+      );
+    } finally {
+      setSalvando(false);
+    }
+  }
   function adicionarImagens(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []);
 
@@ -326,8 +426,7 @@ export default function AdicionarItens() {
         ← Voltar para início
       </button>
 
-      <h1>Adicionar produto ao catálogo</h1>
-
+      <h1>{editandoId ? "Editar produto" : "Adicionar produto ao catálogo"}</h1>
       <input
         className={style.buscaAdmin}
         type="text"
@@ -404,12 +503,38 @@ export default function AdicionarItens() {
           }
         />
 
-        <input
-          type="file"
-          multiple
-          accept="image/*"
-          onChange={adicionarImagens}
-        />
+        {!editandoId && (
+          <>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={adicionarImagens}
+            />
+
+            {preview.length > 0 && (
+              <div className={style.previewContainer}>
+                {preview.map((img, index) => (
+                  <div key={index} className={style.previewItem}>
+                    <img
+                      src={img}
+                      className={style.previewImagem}
+                      alt={`Prévia ${index + 1}`}
+                    />
+
+                    <button
+                      type="button"
+                      className={style.botaoRemoverImagem}
+                      onClick={() => removerImagem(index)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
 
         {preview.length > 0 && (
           <div className={style.previewContainer}>
@@ -436,10 +561,25 @@ export default function AdicionarItens() {
         <button
           disabled={salvando}
           className={style.botao}
-          onClick={cadastrarProduto}
+          onClick={editandoId ? salvarEdicaoProduto : cadastrarProduto}
         >
-          {salvando ? "Salvando..." : "Adicionar produto"}
+          {salvando
+            ? "Salvando..."
+            : editandoId
+              ? "Salvar alterações"
+              : "Adicionar produto"}
         </button>
+
+        {editandoId && (
+          <button
+            type="button"
+            className={style.botaoCancelarEdicao}
+            onClick={cancelarEdicao}
+            disabled={salvando}
+          >
+            Cancelar edição
+          </button>
+        )}
       </div>
 
       <h2>Produtos cadastrados</h2>
@@ -482,12 +622,23 @@ export default function AdicionarItens() {
                 </p>
               </div>
 
-              <button
-                onClick={() => excluirProduto(p.id)}
-                className={style.excluir}
-              >
-                Excluir
-              </button>
+              <div className={style.acoesProduto}>
+                <button
+                  type="button"
+                  onClick={() => abrirEdicao(p)}
+                  className={style.editar}
+                >
+                  Editar
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => excluirProduto(p.id)}
+                  className={style.excluir}
+                >
+                  Excluir
+                </button>
+              </div>
             </div>
           );
         })}

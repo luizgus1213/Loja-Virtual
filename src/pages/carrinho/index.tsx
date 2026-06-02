@@ -2,9 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import styles from "./style.module.css";
+import Image from "next/image";
+import { caminhoImagem } from "@/lib/imagem";
+
 interface CarrinhoResponse {
   itens?: CarrinhoItem[];
 }
+
 interface Produto {
   id: number;
   nome: string;
@@ -131,9 +135,10 @@ export default function CarrinhoPage() {
   function selecionarTodos() {
     if (selecionados.length === itens.length) {
       setSelecionados([]);
-    } else {
-      setSelecionados(itens.map((item) => item.id));
+      return;
     }
+
+    setSelecionados(itens.map((item) => item.id));
   }
 
   async function finalizarCompra() {
@@ -175,6 +180,7 @@ export default function CarrinhoPage() {
       <main className={styles.page}>
         <div className={styles.vazio}>
           <h1>Seu carrinho está vazio</h1>
+
           <p>Adicione produtos ao carrinho para continuar sua compra.</p>
 
           <button type="button" onClick={() => router.push("/")}>
@@ -199,7 +205,9 @@ export default function CarrinhoPage() {
         <header className={styles.header}>
           <div>
             <span>Meu carrinho</span>
+
             <h1>Produtos selecionados</h1>
+
             <p>
               Selecione os itens que deseja comprar. Cupom, endereço e frete
               serão escolhidos no checkout.
@@ -241,7 +249,15 @@ export default function CarrinhoPage() {
                   }`}
                   onClick={() => alternarSelecionado(item.id)}
                 >
-                  <img src={`/${imagem}`} alt={produto?.nome || "Produto"} />
+                  <div className={styles.produtoTopoImagemBox}>
+                    <Image
+                      src={caminhoImagem(imagem)}
+                      alt={produto?.nome || "Produto"}
+                      fill
+                      sizes="52px"
+                      className={styles.produtoTopoImagem}
+                    />
+                  </div>
 
                   <div>
                     <strong>{produto?.nome || "Produto"}</strong>
@@ -282,14 +298,19 @@ export default function CarrinhoPage() {
                       checked={selecionado}
                       onChange={() => alternarSelecionado(item.id)}
                     />
+
                     <span />
                   </label>
 
-                  <img
-                    src={`/${imagem}`}
-                    alt={produto?.nome || "Produto"}
-                    className={styles.imagemProduto}
-                  />
+                  <div className={styles.imagemProdutoBox}>
+                    <Image
+                      src={caminhoImagem(imagem)}
+                      alt={produto?.nome || "Produto"}
+                      fill
+                      sizes="110px"
+                      className={styles.imagemProduto}
+                    />
+                  </div>
 
                   <div className={styles.infoProduto}>
                     <h2>{produto?.nome || "Produto"}</h2>
@@ -323,6 +344,7 @@ export default function CarrinhoPage() {
 
                     <div className={styles.precos}>
                       <strong>{formatarMoeda(preco)}</strong>
+
                       <span>Subtotal: {formatarMoeda(subtotal)}</span>
                     </div>
                   </div>
@@ -331,7 +353,11 @@ export default function CarrinhoPage() {
                     <button
                       type="button"
                       className={styles.botaoVer}
-                      onClick={() => router.push(`/produto/${produto?.id}`)}
+                      onClick={() => {
+                        if (!produto?.id) return;
+
+                        router.push(`/produto/${produto.id}`);
+                      }}
                     >
                       Ver produto
                     </button>
