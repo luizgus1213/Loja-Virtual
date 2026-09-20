@@ -3,11 +3,10 @@ import random
 from pathlib import Path
 
 import requests
-
-BASE_URL = "https://lg-tranbicagens.onrender.com"
-
-EMAIL_ADMIN = "luizgus397@gmail.com"
-SENHA_ADMIN = "Peixe2020!"
+BASE_URL = os.getenv("BASE_URL", "http://localhost:3000")
+ 
+EMAIL_ADMIN = os.getenv("EMAIL_ADMIN")
+SENHA_ADMIN = os.getenv("SENHA_ADMIN")
 
 PASTA_IMAGENS = Path(
     r"C:\Users\Luiz Gustavo\Desktop\react\lg_trambicagens\imagens_produtos"
@@ -140,10 +139,10 @@ def buscar_imagens():
 def login_admin(session: requests.Session):
     resposta = session.post(
         f"{BASE_URL}/api/auth/login",
-        json={
-            "email": luizgus397@gmail.com,
-            "senha": Peixe2020!,
-        },
+      json={
+    "email": EMAIL_ADMIN,
+    "senha": SENHA_ADMIN,
+}  
         timeout=60,
     )
 
